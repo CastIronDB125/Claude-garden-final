@@ -1,0 +1,53 @@
+{
+  "locationName": "Bella Vista, AR",
+  "latitude": 36.4812,
+  "longitude": -94.2724,
+  "timezone": "America/Chicago",
+  "zone": "6b",
+
+  "frost": {
+    "avgLastFrostRange": "Apr 11–20",
+    "conservativeLastFrostMonth": 4,
+    "conservativeLastFrostDay": 20,
+    "safePlantMonth": 4,
+    "safePlantDay": 27
+  },
+
+  "sowWindow": {
+    "start": "2026-02-16",
+    "end": "2026-02-20"
+  },
+
+  "lights": {
+    "on": "06:00",
+    "off": "00:00",
+    "note": "Spider Farmer bar lights + LED strips. Timer-controlled."
+  },
+
+  "hardening": {
+    "warmMoveOutOffsetDays": 7,
+    "tomatoMoveOutOffsetDays": 12,
+    "coolMoveOutOffsetDays": -14,
+    "pepperMinNight": 55,
+    "tomatoMinNight": 50,
+    "lettuceMinNight": 28
+  },
+
+  "nutrients": {
+    "primary": "FoxFarm Big Bloom (OMRI)",
+    "note": "Big Bloom is a micronutrient supplement only — NOT a complete base feed. DWC requires FoxFarm Grow Big Hydro (veg) + Tiger Bloom (flowering/fruiting) + Big Bloom as the Hydro Trio.",
+    "soil": "FoxFarm Ocean Forest"
+  },
+
+  "equipment": {
+    "lights": ["Spider Farmer bar light — middle shelf", "Spider Farmer panel — DWC bottom shelf", "LED strip bar lights — top shelf"],
+    "climate": "VIVOSUN temperature controller — reading 77.3°F",
+    "dwc": "Two DWC buckets with hydroton clay pebbles and air stones"
+  },
+
+  "notes": {
+    "indoor_permanent": "DWC peppers and herbs stay indoors permanently. Hardening does not apply.",
+    "outdoor_container": "Lettuce, tomatoes, soil peppers, and bonsai starts are tracked for outdoor hardening.",
+    "bonsai": "First bonsai season. All three sown Feb 16–20, 2026. Long-term training projects."
+  }
+}
