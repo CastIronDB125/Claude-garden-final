@@ -642,8 +642,7 @@ function renderDWC(p,tc) {
   const lastDWC = dwcLogs.length ? dwcLogs[dwcLogs.length-1] : null;
 
   tc.innerHTML = `
-    <div class="alert warn"><strong>Nutrient alert:</strong> Big Bloom alone is incomplete.
-      Complete program: <strong>FoxFarm Grow Big Hydro</strong> (veg, N) + <strong>Tiger Bloom</strong> (flowering, P/K) + Big Bloom (micros).</div>
+    <div class="alert good"><strong>Nutrient program complete ✓</strong> FoxFarm Hydro Trio on hand — Grow Big Hydro (veg, N) + Tiger Bloom (flowering, P/K) + Big Bloom (micros). Follow the FoxFarm feed chart and pH-adjust after mixing.</div>
 
     <div class="metrics-row">
       <div class="metric"><div class="metric-label">Last pH</div>
@@ -764,8 +763,8 @@ function renderFeed(p,tc) {
         <button class="btn btn-green" onclick="addFeed('${p.id}')">Log</button>
       </div>
     </div>
-    ${p.system==='DWC'?`<div class="alert warn">
-      <strong>FoxFarm Hydro Trio schedule:</strong><br>
+    ${p.system==='DWC'?`<div class="alert good">
+      <strong>FoxFarm Hydro Trio complete ✓</strong><br>
       Wk 1–3: Grow Big Hydro ¼ str · Wk 4–6: + Big Bloom · Wk 7+: Tiger Bloom + Big Bloom<br>
       Always pH-adjust reservoir AFTER mixing nutrients.
     </div>`:''}
