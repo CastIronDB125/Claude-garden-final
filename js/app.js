@@ -258,84 +258,6 @@ function weatherNarrative(cur, daily) {
   return { opening, verdict };
 }
 
-// ── HOURLY HARDENING WINDOW ───────────────────────────────────────────
-function renderHourlyWindow(cur, daily, sunrise, sunset) {
-  const lo      = Math.round(daily.temperature_2m_min[0]);
-  const hi      = Math.round(daily.temperature_2m_max[0]);
-  const wind    = Math.round(cur.wind_speed_10m);
-  const srHour  = new Date(sunrise).getHours();
-  const ssHour  = new Date(sunset).getHours();
-
-  // Per-crop guidance based on overnight low
-  const crops = [
-    {
-      name: 'Lettuce', minNight: 28, color: 'var(--green)',
-      outdoorStart: srHour + 1,
-      outdoorEnd:   ssHour - 1,
-      waterWindow:  '6–8 AM or 5–7 PM',
-      bringIn:      `${ssHour - 1}:00`,
-      note:         lo < 28 ? 'Too cold tonight — skip.' : 'Cold-tolerant. Most flexible schedule.'
-    },
-    {
-      name: 'Tomatoes', minNight: 50, color: 'var(--red)',
-      outdoorStart: srHour + 2,
-      outdoorEnd:   ssHour - 2,
-      waterWindow:  '7–9 AM or 4–6 PM',
-      bringIn:      `${ssHour - 2}:00`,
-      note:         lo < 50 ? `${lo}°F tonight — too cold. Skip outdoor exposure.` : 'Good to harden today.'
-    },
-    {
-      name: 'Peppers', minNight: 55, color: 'var(--amber)',
-      outdoorStart: srHour + 3,
-      outdoorEnd:   ssHour - 3,
-      waterWindow:  '8–10 AM or 3–5 PM',
-      bringIn:      `${ssHour - 3}:00`,
-      note:         lo < 55 ? `${lo}°F tonight — too cold for peppers (need 55°F+). Stay inside.` : 'Safe to harden today.'
-    },
-    {
-      name: 'Superhots', minNight: 60, color: 'var(--purple)',
-      outdoorStart: srHour + 3,
-      outdoorEnd:   ssHour - 3,
-      waterWindow:  '8–10 AM',
-      bringIn:      `${ssHour - 3}:00`,
-      note:         lo < 60 ? `${lo}°F tonight — superhots want 60°F+. Keep inside.` : 'Safe window today.'
-    },
-    {
-      name: 'Bonsai', minNight: 32, color: 'var(--blue)',
-      outdoorStart: srHour + 1,
-      outdoorEnd:   ssHour - 2,
-      waterWindow:  '7–9 AM',
-      bringIn:      `${ssHour - 2}:00`,
-      note:         lo < 32 ? 'Frost risk — inside only.' : 'Can handle today\'s conditions. Watch watering.'
-    }
-  ];
-
-  const windWarn = wind > 20 ? `<div class="hourly-wind-warn">⚠ Wind ${wind} mph — reduce outdoor time for all crops. Seedlings especially vulnerable.</div>` : '';
-
-  return `
-    <div class="hourly-window">
-      <div class="hourly-header">
-        <span class="hourly-title">Today's outdoor window</span>
-        <span class="hourly-sub">Sunrise ${fmtTime(sunrise)} · Sunset ${fmtTime(sunset)} · Hi ${hi}° / Lo ${lo}°</span>
-      </div>
-      ${windWarn}
-      <div class="hourly-grid">
-        ${crops.map(cr => {
-          const ok = lo >= cr.minNight;
-          const startFmt = cr.outdoorStart <= 12 ? cr.outdoorStart + ':00 AM' : (cr.outdoorStart - 12) + ':00 PM';
-          const endFmt   = cr.outdoorEnd   <= 12 ? cr.outdoorEnd   + ':00 AM' : (cr.outdoorEnd   - 12) + ':00 PM';
-          return `<div class="hourly-crop ${ok?'ok':'blocked'}">
-            <div class="hc-name" style="color:${cr.color}">${cr.name}</div>
-            <div class="hc-window">${ok ? startFmt + ' – ' + endFmt : 'Indoor only'}</div>
-            <div class="hc-water">💧 ${cr.waterWindow}</div>
-            <div class="hc-note">${cr.note}</div>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>
-  `;
-}
-
 function renderWeather(data) {
   const c = state.config;
   const cur = data.current;
@@ -363,8 +285,6 @@ function renderWeather(data) {
   })();
 
   const narrative = weatherNarrative(cur, daily);
-  const hourlyHTML = renderHourlyWindow(cur, daily, daily.sunrise[0], daily.sunset[0]);
-
   const panel = document.getElementById('weather-panel');
 
   let existingBtn = document.getElementById('wx-toggle');
@@ -454,6 +374,11 @@ function renderWeather(data) {
         <span class="gm-val info">Feb 16–20</span>
         <span class="gm-sub">2026</span>
       </div>
+      <div class="wx-garden-metric">
+        <span class="gm-label">Today outside</span>
+        <span class="gm-val ${(()=>{const l=Math.round(daily.temperature_2m_min[0]);return l<=32?'frost':l<=40?'warn':l<=50?'info':l<=55?'warn':'good';})()}">${(()=>{const l=Math.round(daily.temperature_2m_min[0]);if(l<=32)return 'Frost — inside';if(l<=40)return 'Lettuce only';if(l<=50)return 'Lettuce+Bonsai';if(l<=55)return 'Tomatoes OK';return 'All crops OK';})()}</span>
+        <span class="gm-sub">${(()=>{const l=Math.round(daily.temperature_2m_min[0]);const sr=new Date(daily.sunrise[0]).getHours();const ss=new Date(daily.sunset[0]).getHours();const f=h=>h<=12?h+':00AM':(h-12)+':00PM';if(l<=32)return 'No outdoor today';if(l<=50)return f(sr+1)+'–'+f(ss-1);return f(sr+2)+'–'+f(ss-2);})()}</span>
+      </div>
     </div>
 
     <div class="wx-forecast-strip">
@@ -479,8 +404,7 @@ function renderWeather(data) {
         </div>`;
       }).join('')}
     </div>
-        ${hourlyHTML}
-  `;
+      `;
 }
 
 function toggleWeather() {
