@@ -83,7 +83,7 @@ body::before {
   flex-shrink: 0; background: transparent;
   overflow-y: visible; max-height: none;
 }
-.wx-sticky {
+#wx-sticky-header {
   position: sticky;
   top: var(--header-h);
   z-index: 90;
@@ -91,6 +91,7 @@ body::before {
   border-bottom: 1px solid var(--border);
   backdrop-filter: blur(3px);
 }
+.wx-sticky { position: static; }
 #weather-panel::-webkit-scrollbar { height: 3px; }
 
 .wx-top {
@@ -451,6 +452,7 @@ select option { background: var(--bg3); }
   #body    { flex-direction: column; min-height: 0; }
   #sidebar { position: static !important; height: auto !important; max-height: 220px; overflow-y: auto !important; border-right: none; border-bottom: 1px solid var(--border); flex-shrink: 0; }
   #detail  { position: static !important; height: auto !important; overflow: visible !important; flex: 1; min-height: 60vh; }
+  #wx-sticky-header { position: sticky; top: 44px; z-index: 90; background: rgba(10,14,10,0.82); }
 
   /* ── Header compact ── */
   #top-header { padding: 0 12px; min-height: 44px; }
@@ -460,7 +462,7 @@ select option { background: var(--bg3); }
   /* ── Weather panel — collapsed by default on mobile ── */
   #weather-panel {
     flex-shrink: 0;
-    overflow: hidden;
+    overflow: visible;
     max-height: 120px;        /* show narrative + temp only */
     transition: max-height 0.3s ease;
   }
