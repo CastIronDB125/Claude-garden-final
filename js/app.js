@@ -1,3 +1,72 @@
+// ── GLOBALS ───────────────────────────────────────────────────────────
+const LS_KEY = 'gardenBlended_v2';
+const TODAY  = new Date();
+
+let state = {
+  config:  {},
+  plants:  [],
+  logs:    { daily: [], dwc: [] }
+};
+let weatherData   = null;
+let selectedId    = null;
+let currentFilter = 'All';
+let currentTab    = 'overview';
+
+// ── HELPERS ───────────────────────────────────────────────────────────
+function addDays(date, n) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + n);
+  return d;
+}
+
+function daysSince(isoStr) {
+  if (!isoStr) return null;
+  const start = new Date(isoStr);
+  if (isNaN(start)) return null;
+  return Math.floor((TODAY - start) / 86400000);
+}
+
+function daysUntil(date) {
+  return Math.ceil((new Date(date) - TODAY) / 86400000);
+}
+
+function isoToday() {
+  return TODAY.toISOString().slice(0, 10);
+}
+
+function nowStr() {
+  return TODAY.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function fmtDate(isoStr) {
+  if (!isoStr) return '—';
+  const d = new Date(isoStr);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function fmtShortDate(date) {
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function cat(p) {
+  if (p.viability)       return 'Uncertain';
+  if (p.system === 'DWC') return 'DWC';
+  if (p.category === 'Pepper' || p.group === 'Peppers — Soil') return 'Soil';
+  if (p.category === 'Tomato')  return 'Soil';
+  if (p.category === 'Lettuce') return 'Soil';
+  if (p.system === 'Bonsai')    return 'Bonsai';
+  if (p.group && p.group.includes('Herb')) return 'Soil';
+  return 'Soil';
+}
+
+function frostSafeDate() {
+  return new Date(state.config.lastFrost || '2026-04-20');
+}
+
+function safePlantDate() {
+  return new Date(state.config.safePlanting || '2026-04-27');
+}
+
 const STAGE_OPTIONS = [
   'Seeds — not yet sown','Seeds — sown, not sprouted','Just germinated / sprouted',
   'Seedling (cotyledons)','Seedling (true leaves emerging)','Early vegetative','Vegetative',
@@ -129,7 +198,7 @@ async function fetchWeather() {
   try {
     const data = await fetch(url).then(r => r.json());
     weatherData = data;
-    renderWeather(data);
+    renderWeather(data.current, data.daily);
     if(currentTab === 'harden off') renderTab();
   } catch(e) {
     document.getElementById('weather-panel').innerHTML = '<div style="padding:14px 18px;color:var(--text3);font-size:12px">Weather unavailable — check connection.</div>';
