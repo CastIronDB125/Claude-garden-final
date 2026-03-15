@@ -79,8 +79,16 @@ body::before {
 
 /* ── WEATHER PANEL ─────────────────────────── */
 #weather-panel {
-  flex-shrink: 0; background: transparent; border-bottom: 1px solid var(--border);
+  flex-shrink: 0; background: transparent;
   overflow-y: visible; max-height: none;
+}
+.wx-sticky {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 90;
+  background: rgba(10,14,10,0.82);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(3px);
 }
 #weather-panel::-webkit-scrollbar { height: 3px; }
 
