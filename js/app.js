@@ -257,7 +257,19 @@ function weatherNarrative(cur, daily) {
   if(pop > 60) verdict += ` Rain likely (${pop}%) — skip outdoor sessions today.`;
   else if(pop > 30) verdict += ` Rain chance ${pop}% — check forecast before going out.`;
 
-  return { opening, verdict };
+    const _frostDays  = daily.temperature_2m_min.filter(t => Math.round(t) <= 32).length;
+  const _freezeDays = daily.temperature_2m_min.filter(t => Math.round(t) <= 28).length;
+  const _highPop    = (daily.precipitation_probability_max||[]).some(p => p >= 70);
+  const _highRain   = (daily.precipitation_sum||[]).some(r => r >= 1.0);
+  let _alert = '';
+  if(_freezeDays >= 1)
+    _alert = '<span style="color:#6495ED;font-weight:700;display:block;margin-bottom:3px">❄️ FREEZE WARNING — ' + _freezeDays + ' night' + (_freezeDays>1?'s':'') + ' at or below 28°F in forecast</span>';
+  else if(_frostDays >= 1)
+    _alert = '<span style="color:#87CEEB;font-weight:700;display:block;margin-bottom:3px">❅ FROST ADVISORY — ' + _frostDays + ' night' + (_frostDays>1?'s':'') + ' at or below 32°F in forecast</span>';
+  else if(_highPop && _highRain)
+    _alert = '<span style="color:#DAA520;font-weight:700;display:block;margin-bottom:3px">⚡ RAIN ADVISORY — Heavy rain likely in forecast</span>';
+return { opening, verdict };
+}_alert + `return { opening, verdict };
 }
 
 function renderWeather(data) {
