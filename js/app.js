@@ -226,50 +226,28 @@ function weatherNarrative(cur, daily) {
   const temp   = Math.round(cur.temperature_2m);
   const feels  = Math.round(cur.apparent_temperature);
   const lo     = Math.round(daily.temperature_2m_min[0]);
-  const hi     = Math.round(daily.temperature_2m_max[0]);
   const wind   = Math.round(cur.wind_speed_10m);
-  const code   = cur.weather_code;
   const pop    = daily.precipitation_probability_max[0] || 0;
-
-  const condition = code === 0 ? 'Clear' : code <= 2 ? 'Mostly clear' : code <= 3 ? 'Overcast' :
-    code <= 45 ? 'Foggy' : code <= 55 ? 'Drizzle' : code <= 67 ? 'Rainy' :
-    code <= 77 ? 'Snowing' : 'Stormy';
-
-  let opening = `${condition} now, ${temp}°F`;
-  if(Math.abs(temp - feels) >= 4) opening += ` with a feels-like of ${feels}°F`;
-  opening += `. Tonight bottoms out near ${lo}°F`;
-  if(wind > 15) opening += `, winds ${wind} mph`;
-  opening += '.';
-
-  let verdict = '';
-  if(lo <= 32) {
-    verdict = 'Frost risk tonight — keep everything inside. No hardening today.';
-  } else if(lo <= 40) {
-    verdict = `Watch night: ${lo}°F is too cold for tomatoes and peppers. Lettuce and bonsai only if the day is calm.`;
-  } else if(lo <= 50) {
-    verdict = `Reasonable day for lettuce or hardy bonsai exposure. Too cold tonight for tomatoes and peppers.`;
-  } else if(lo <= 55) {
-    verdict = `Good for lettuce and tomato hardening. Peppers and superhots still want warmer nights — hold off.`;
-  } else {
-    verdict = `Good conditions across the board. Peppers can go out on schedule. Monitor wind.`;
-  }
-
-  if(pop > 60) verdict += ` Rain likely (${pop}%) — skip outdoor sessions today.`;
-  else if(pop > 30) verdict += ` Rain chance ${pop}% — check forecast before going out.`;
-
-    const _frostDays  = daily.temperature_2m_min.filter(t => Math.round(t) <= 32).length;
+  const _frostDays  = daily.temperature_2m_min.filter(t => Math.round(t) <= 32).length;
   const _freezeDays = daily.temperature_2m_min.filter(t => Math.round(t) <= 28).length;
   const _highPop    = (daily.precipitation_probability_max||[]).some(p => p >= 70);
-  const _highRain   = (daily.precipitation_sum||[]).some(r => r >= 1.0);
+  const _highRain   = (daily.precipitation_sum||[]).some(rv => rv >= 1.0);
   let _alert = '';
   if(_freezeDays >= 1)
-    _alert = '<span style="color:#6495ED;font-weight:700;display:block;margin-bottom:3px">❄️ FREEZE WARNING — ' + _freezeDays + ' night' + (_freezeDays>1?'s':'') + ' at or below 28°F in forecast</span>';
+    _alert = '<strong style="color:#6495ED;display:block;margin-bottom:4px">FREEZE WARNING &mdash; ' + _freezeDays + ' night' + (_freezeDays>1?'s':'') + ' at/below 28&deg;F in forecast</strong>';
   else if(_frostDays >= 1)
-    _alert = '<span style="color:#87CEEB;font-weight:700;display:block;margin-bottom:3px">❅ FROST ADVISORY — ' + _frostDays + ' night' + (_frostDays>1?'s':'') + ' at or below 32°F in forecast</span>';
+    _alert = '<strong style="color:#87CEEB;display:block;margin-bottom:4px">FROST ADVISORY &mdash; ' + _frostDays + ' night' + (_frostDays>1?'s':'') + ' at/below 32&deg;F in forecast</strong>';
   else if(_highPop && _highRain)
-    _alert = '<span style="color:#DAA520;font-weight:700;display:block;margin-bottom:3px">⚡ RAIN ADVISORY — Heavy rain likely in forecast</span>';
-return { opening, verdict };
-}_alert + `return { opening, verdict };
+    _alert = '<strong style="color:#DAA520;display:block;margin-bottom:4px">RAIN ADVISORY &mdash; Heavy rain likely in forecast</strong>';
+  let opening = temp + '\u00b0F with a feels-like of ' + feels + '\u00b0F. Tonight bottoms out near ' + lo + '\u00b0F';
+  if(wind > 20) opening += ', winds ' + wind + ' mph';
+  opening += '.';
+  let verdict;
+  if(lo <= 32) verdict = 'Frost risk tonight \u2014 keep everything inside. No hardening today.' + (pop > 30 ? ' Rain chance ' + pop + '%.' : '');
+  else if(lo <= 40) verdict = 'Reasonable day for lettuce or hardy bonsai. Too cold tonight for tomatoes and peppers.';
+  else if(lo <= 50) verdict = 'Good day for lettuce, bonsai, and tomatoes. Peppers should stay in overnight.';
+  else verdict = 'Good outdoor day for all crops. Overnight lows are safe.';
+  return { opening, verdict: _alert + verdict };
 }
 
 function renderWeather(data) {
