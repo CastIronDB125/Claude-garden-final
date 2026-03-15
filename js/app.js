@@ -494,6 +494,7 @@ function toggleWeather() {
   const expanded = panel.classList.toggle('wx-expanded');
   btn.textContent = expanded ? '▲ collapse weather' : '▼ show full weather';
   localStorage.setItem('wx-expanded', expanded ? '1' : '0');
+  document.getElementById('app').classList.toggle('wx-open', expanded);
 }
 
 // ── DATE HELPERS ─────────────────────────────────────────────────────
