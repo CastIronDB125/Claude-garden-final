@@ -76,6 +76,7 @@ function saveLogs() {
       _phLog: p._phLog,
       _ecLog: p._ecLog,
       _waterLog: p._waterLog,
+      _photos: p._photos,
       _hardenStart: p._hardenStart,
       _stage: p._stage,
       _lightHours: p._lightHours
@@ -99,6 +100,7 @@ function loadLogs() {
       p._phLog       = m ? (m._phLog  || []) : [];
       p._ecLog       = m ? (m._ecLog  || []) : [];
       p._waterLog    = m ? (m._waterLog || []) : [];
+      p._photos      = m ? (m._photos     || []) : [];
       p._hardenStart = m ? (m._hardenStart || null) : null;
       p._stage       = m ? (m._stage  || p.status) : p.status;
       p._lightHours  = m ? (m._lightHours || defaultLight(p)) : defaultLight(p);
@@ -106,7 +108,7 @@ function loadLogs() {
   } catch(e) {
     state.logs = {daily:[], dwc:[]};
     state.plants.forEach(p => {
-      p._notes=[]; p._feeds=[]; p._phLog=[]; p._ecLog=[]; p._waterLog=[];
+      p._notes=[]; p._feeds=[]; p._phLog=[]; p._ecLog=[]; p._waterLog=[]; p._photos=[];
       p._hardenStart=null; p._stage=p.status; p._lightHours=defaultLight(p);
     });
   }
@@ -489,18 +491,25 @@ function renderDetail() {
   const days = daysSince(p.sowDate);
   d.innerHTML = `
     <div id="detail-header">
-      <div class="detail-title-row">
-        <div class="detail-title">${p.plant}</div>
-        <div class="detail-badges">
-          <span class="badge badge-${c.toLowerCase()}">${c}</span>
-          ${p.hardeningRequired?'<span class="badge badge-harden">harden off</span>':''}
-          ${p.viability?'<span class="badge badge-uncertain">low viability</span>':''}
-          ${p.nickname?`<span class="badge badge-nickname">${p.nickname}</span>`:''}
+      <div class="detail-header-inner">
+        <div class="detail-header-meta">
+          <div class="detail-title-row">
+            <div class="detail-title">${p.plant}</div>
+            <div class="detail-badges">
+              <span class="badge badge-${c.toLowerCase()}">${c}</span>
+              ${p.hardeningRequired?'<span class="badge badge-harden">harden off</span>':''}
+              ${p.viability?'<span class="badge badge-uncertain">low viability</span>':''}
+              ${p.nickname?`<span class="badge badge-nickname">${p.nickname}</span>`:''}
+            </div>
+          </div>
+          <div class="detail-meta">${p.variety} · ${p.destination}</div>
+          <div class="detail-id">${p.id}${p.bucket?' · Bucket: '+p.bucket:''}</div>
+          ${p.sowDate?`<div class="detail-meta dim">Sown ${fmtDate(p.sowDate)} · Day ${days}</div>`:''}
         </div>
+        ${latestPhoto(p)
+          ? `<div class="detail-header-photo"><img src="${latestPhoto(p).b64}" alt="Latest photo" loading="lazy"><span class="detail-photo-date">${latestPhoto(p).date}</span></div>`
+          : '<div class="detail-header-photo-empty">U0001f331</div>'}
       </div>
-      <div class="detail-meta">${p.variety} · ${p.destination}</div>
-      <div class="detail-id">${p.id}${p.bucket?' · Bucket: '+p.bucket:''}</div>
-      ${p.sowDate?`<div class="detail-meta dim">Sown ${fmtDate(p.sowDate)} · Day ${days}</div>`:''}
     </div>
     <div style="padding:0 18px;border-bottom:1px solid var(--border);flex-shrink:0">
       <div class="tab-bar">${tabs.map(t=>`<button class="tab${currentTab===t?' active':''}" onclick="setTab('${t}')">${t}</button>`).join('')}</div>
@@ -520,6 +529,39 @@ function renderTab() {
   else if(currentTab==='feed')  renderFeed(p,tc);
   else if(currentTab==='light') renderLight(p,tc);
   else if(currentTab==='harden off') renderHarden(p,tc);
+}
+
+
+// ── PHOTO HELPERS ─────────────────────────────────────
+function compressPhoto(file, callback) {
+  const MAX_W = 900, QUALITY = 0.65;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ratio = Math.min(1, MAX_W / img.width);
+      canvas.width  = Math.round(img.width  * ratio);
+      canvas.height = Math.round(img.height * ratio);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      callback(canvas.toDataURL('image/jpeg', QUALITY));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function addPhotoToPlant(plantId, b64, date) {
+  const p = state.plants.find(x => x.id === plantId); if(!p) return false;
+  if(!p._photos) p._photos = [];
+  p._photos.unshift({ b64, date });
+  if(p._photos.length > 10) p._photos = p._photos.slice(0, 10);
+  saveLogs();
+  return true;
+}
+
+function latestPhoto(p) {
+  return (p._photos && p._photos.length) ? p._photos[0] : null;
 }
 
 // ── OVERVIEW ─────────────────────────────────────────────────────────
@@ -680,6 +722,15 @@ function renderGrowLog(p,tc) {
         </select></label>
         <label>Zone / location<input type="text" id="gl-zone" placeholder="Top shelf / middle rack"></label>
         <label class="full">Notes<textarea id="gl-notes" rows="3" placeholder="Observations, measurements, changes..."></textarea></label>
+        <div class="full" style="margin-top:6px">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:2px">Photo (optional)</div>
+          <label class="photo-upload-label">
+            U0001f4f7 Choose photo
+            <input type="file" accept="image/*" id="gl-photo" capture="environment"
+              onchange="document.getElementById('gl-photo-name').textContent=this.files[0]?this.files[0].name:''">
+          </label>
+          <span id="gl-photo-name" class="photo-name-preview"></span>
+        </div>
       </div>
       <button class="btn btn-green" style="margin-top:8px" onclick="saveGrowLog('${p.id}')">Save log entry</button>
     </div>
@@ -903,6 +954,14 @@ function saveGrowLog(id) {
     notes:         get('gl-notes')
   };
   state.logs.daily.push(entry);
+  const photoInput = document.getElementById('gl-photo');
+  if(photoInput && photoInput.files && photoInput.files[0]) {
+    const dateStr = entry.date || isoToday();
+    compressPhoto(photoInput.files[0], b64 => {
+      addPhotoToPlant(id, b64, dateStr);
+      renderDetail();
+    });
+  }
   saveLogs(); renderTab();
 }
 function startHarden(id) {
