@@ -178,7 +178,7 @@ body::before {
 .uv-vhigh  { background: #2a0a2a; color: var(--purple); }
 
 /* ── BODY ──────────────────────────────────── */
-#body { display: flex; min-height: calc(100vh - var(--header-h) - 52px); }
+#body { display: flex; }
 
 /* ── SIDEBAR ───────────────────────────────── */
 #sidebar {
@@ -445,9 +445,9 @@ select option { background: var(--bg3); }
 @media (max-width: 650px) {
   :root { --sidebar-w: 100%; }
 
-  /* ── App shell — full vertical stack ── */
-  html, body { overflow: hidden; }
-  #app { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+  /* ── App shell — natural scroll on mobile ── */
+  html, body { overflow-x: hidden; }
+  #app { min-height: 100dvh; display: flex; flex-direction: column; }
 
   /* ── Header compact ── */
   #top-header { padding: 0 12px; min-height: 44px; }
@@ -493,20 +493,17 @@ select option { background: var(--bg3); }
 
   /* ── Body: sidebar above, detail below ── */
   #body {
-    flex: 1;
     flex-direction: column;
-    overflow: hidden;
-    min-height: 0;
   }
 
   /* Sidebar: compact horizontal scrolling strip */
   #sidebar {
     height: auto;
-    min-height: 0;
     max-height: 220px;
     border-right: none;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
+    position: static;
   }
   #filter-bar {
     padding: 6px 10px;
@@ -537,7 +534,9 @@ select option { background: var(--bg3); }
     flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    min-height: 0;
+    min-height: 60vh;
+    position: static;
+    height: auto;
   }
   #detail-header { padding: 10px 14px 0; }
   .detail-title { font-size: 15px; }
