@@ -153,3 +153,5 @@ Add an object to `data/plants.json`. Follow the existing format. Key fields:
 - All log data stored in **browser localStorage only** — nothing sent to any server
 - Weather: [Open-Meteo](https://open-meteo.com/) (free, no API key)
 - Export regularly using the Export button — especially before clearing browser data
+
+<!-- cache bust 2026-03-15 -->
