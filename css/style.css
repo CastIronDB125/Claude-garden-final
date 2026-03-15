@@ -68,7 +68,8 @@ body::before {
 #top-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 18px; height: var(--header-h); min-height: var(--header-h);
-  border-bottom: 1px solid var(--border); background: var(--bg2); flex-shrink: 0;
+  border-bottom: 1px solid var(--border); background: rgba(10,14,10,0.90); flex-shrink: 0;
+  backdrop-filter: blur(4px);
 }
 #top-header h1 { font-family: var(--serif); font-size: 16px; font-weight: 500; color: var(--green); }
 #top-header p  { font-size: 11px; color: var(--text3); margin-top: 1px; }
@@ -78,7 +79,7 @@ body::before {
 
 /* ── WEATHER PANEL ─────────────────────────── */
 #weather-panel {
-  flex-shrink: 0; background: var(--bg2); border-bottom: 1px solid var(--border);
+  flex-shrink: 0; background: transparent; border-bottom: 1px solid var(--border);
   overflow-y: visible; max-height: none;
 }
 #weather-panel::-webkit-scrollbar { height: 3px; }
@@ -548,7 +549,7 @@ select option { background: var(--bg3); }
 .wx-narrative {
   padding: 12px 18px 10px;
   border-bottom: 1px solid var(--border);
-  background: var(--bg2);
+  background: transparent;
 }
 .wx-narrative-opening {
   font-family: var(--serif);
@@ -566,7 +567,7 @@ select option { background: var(--bg3); }
 /* ── HOURLY HARDENING WINDOW ─────────────────────────────────────────── */
 .hourly-window {
   border-top: 1px solid var(--border);
-  background: var(--bg2);
+  background: transparent;
 }
 .hourly-header {
   display: flex;
