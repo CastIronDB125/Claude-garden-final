@@ -4,8 +4,8 @@
 
 :root {
   --bg:          #0e110d;
-  --bg2:         #141810;
-  --bg3:         #1a1f16;
+  --bg2:         rgba(18, 22, 14, 0.93);
+  --bg3:         rgba(24, 30, 18, 0.95);
   --bg4:         #212618;
   --border:      #2a3020;
   --border2:     #3a4228;
@@ -37,7 +37,24 @@
   --weather-h:   auto;
 }
 
-html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--mono); font-size: 13px; line-height: 1.5; }
+html, body { height: 100%; color: var(--text); font-family: var(--mono); font-size: 13px; line-height: 1.5; overflow: hidden; }
+body {
+  background-color: var(--bg);
+  background-image: url('https://images.unsplash.com/photo-1599598425947-5202edd56bdb?w=1920&q=80&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center 30%;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 14, 10, 0.88);
+  z-index: 0;
+  pointer-events: none;
+}
+#app { position: relative; z-index: 1; }
 
 /* ── SCROLLBARS ────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -45,14 +62,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
 /* ── APP SHELL ─────────────────────────────── */
-#app { display: flex; flex-direction: column; min-height: 100vh; }
+#app { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
 /* ── TOP HEADER ────────────────────────────── */
 #top-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 18px; height: var(--header-h); min-height: var(--header-h);
   border-bottom: 1px solid var(--border); background: var(--bg2); flex-shrink: 0;
-  position: sticky; top: 0; z-index: 100;
 }
 #top-header h1 { font-family: var(--serif); font-size: 16px; font-weight: 500; color: var(--green); }
 #top-header p  { font-size: 11px; color: var(--text3); margin-top: 1px; }
@@ -62,7 +78,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 /* ── WEATHER PANEL ─────────────────────────── */
 #weather-panel {
-  flex-shrink: 0; background: var(--bg2);
+  flex-shrink: 0; background: var(--bg2); border-bottom: 1px solid var(--border);
   overflow-y: visible; max-height: none;
 }
 #weather-panel::-webkit-scrollbar { height: 3px; }
@@ -70,13 +86,6 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .wx-top {
   display: grid; grid-template-columns: auto 1fr auto;
   gap: 0; align-items: stretch; min-height: 90px;
-}
-.wx-sticky {
-  position: sticky;
-  top: var(--header-h);
-  z-index: 90;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
 }
 
 .wx-current {
@@ -159,14 +168,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .uv-vhigh  { background: #2a0a2a; color: var(--purple); }
 
 /* ── BODY ──────────────────────────────────── */
-#body { display: flex; min-height: calc(100vh - var(--header-h) - 52px); }
+#body { display: flex; flex: 1; overflow: hidden; min-height: 0; }
 
 /* ── SIDEBAR ───────────────────────────────── */
 #sidebar {
   width: var(--sidebar-w); min-width: var(--sidebar-w);
   display: flex; flex-direction: column;
   border-right: 1px solid var(--border); background: var(--bg2); overflow: hidden;
-  position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); align-self: flex-start;
 }
 #filter-bar {
   display: flex; gap: 4px; padding: 9px 12px; flex-wrap: wrap;
@@ -205,14 +213,50 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .badge-nickname      { background: var(--bg4);       color: var(--text2);  border: 1px solid var(--border2); }
 
 /* ── DETAIL PANEL ──────────────────────────── */
-#detail { flex: 1; display: flex; flex-direction: column; overflow: hidden;
-  position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); }
+#detail { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
 .empty-detail { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 13px; }
 
 #detail-header {
   padding: 14px 18px 0; border-bottom: 1px solid var(--border);
   background: var(--bg); flex-shrink: 0;
 }
+.detail-header-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+.detail-header-meta { flex: 1; min-width: 0; }
+.detail-header-photo {
+  flex-shrink: 0; width: 80px; height: 80px;
+  border-radius: var(--rl); overflow: hidden;
+  border: 1px solid var(--border); background: var(--bg3);
+  position: relative;
+}
+.detail-header-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.detail-header-photo-empty {
+  width: 80px; height: 80px;
+  border-radius: var(--rl);
+  border: 1px dashed var(--border2); background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; color: var(--text3); font-size: 22px; opacity: 0.3;
+}
+.detail-photo-date {
+  position: absolute; bottom: 3px; right: 4px;
+  font-size: 8px; color: rgba(255,255,255,0.75);
+  background: rgba(0,0,0,0.55); padding: 1px 4px;
+  border-radius: 4px; font-family: var(--mono); pointer-events: none;
+}
+.photo-upload-label {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 11px;
+  padding: 6px 12px; border-radius: var(--r);
+  border: 1px solid var(--border2); background: transparent;
+  color: var(--text2); cursor: pointer; transition: all .15s; margin-top: 4px;
+}
+.photo-upload-label:hover { border-color: var(--green-dim); color: var(--text); background: var(--bg3); }
+.photo-upload-label input[type=file] { display: none; }
+.photo-name-preview { font-size: 10px; color: var(--green); margin-top: 3px; display: block; font-family: var(--mono); }
 .detail-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .detail-title     { font-family: var(--serif); font-size: 18px; font-weight: 500; color: var(--text); }
 .detail-badges    { display: flex; gap: 4px; flex-wrap: wrap; padding-top: 2px; flex-shrink: 0; }
@@ -363,20 +407,20 @@ select option { background: var(--bg3); }
   display: none; /* hidden on desktop */
   width: 100%;
   flex-shrink: 0;
-  padding: 11px 18px;
-  background: var(--green-bg);
+  padding: 9px 18px;
+  background: var(--bg3);
   border: none;
-  border-top: 1px solid var(--green-dim);
   border-bottom: 1px solid var(--border);
-  color: var(--green);
+  color: var(--text2);
   font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 11px;
   cursor: pointer;
   text-align: center;
   letter-spacing: .05em;
+  position: relative;
+  z-index: 1;
 }
-.wx-collapse-btn:hover { background: var(--bg3); color: var(--text); }
+.wx-collapse-btn:hover { background: var(--bg4); color: var(--text); }
 
 /* ── RESPONSIVE ────────────────────────────── */
 @media (max-width: 900px) {
@@ -392,9 +436,6 @@ select option { background: var(--bg3); }
   /* ── App shell — full vertical stack ── */
   html, body { overflow: hidden; }
   #app { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
-  #app.wx-open { height: auto; min-height: 100dvh; overflow-y: auto; }
-  body:has(#app.wx-open) { overflow-y: auto !important; }
-  html:has(#app.wx-open) { overflow-y: auto !important; }
 
   /* ── Header compact ── */
   #top-header { padding: 0 12px; min-height: 44px; }
@@ -409,7 +450,7 @@ select option { background: var(--bg3); }
     transition: max-height 0.3s ease;
   }
   #weather-panel.wx-expanded {
-    max-height: 55vh;
+    max-height: 85vh;         /* expanded: scrollable full panel */
     overflow-y: auto;
   }
 
