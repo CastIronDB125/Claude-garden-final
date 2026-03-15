@@ -70,6 +70,7 @@ body::before {
   padding: 0 18px; height: var(--header-h); min-height: var(--header-h);
   border-bottom: 1px solid var(--border); background: rgba(10,14,10,0.90); flex-shrink: 0;
   backdrop-filter: blur(4px);
+  position: sticky; top: 0; z-index: 100;
 }
 #top-header h1 { font-family: var(--serif); font-size: 16px; font-weight: 500; color: var(--green); }
 #top-header p  { font-size: 11px; color: var(--text3); margin-top: 1px; }
