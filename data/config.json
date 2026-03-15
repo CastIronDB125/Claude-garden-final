@@ -19,8 +19,8 @@
   },
 
   "lights": {
-    "on": "06:00",
-    "off": "00:00",
+    "on": "05:15",
+    "off": "22:45",
     "note": "Spider Farmer bar lights + LED strips. Timer-controlled."
   },
 
