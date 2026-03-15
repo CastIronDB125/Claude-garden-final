@@ -107,67 +107,83 @@ body::before {
   flex-shrink: 0;
 }
 
+/* ── NARRATIVE ── open text, no box ── */
 .wx-narrative {
-  padding: 10px 18px 8px;
+  padding: 10px 20px 9px;
   border-bottom: 1px solid var(--border);
 }
 .wx-narrative-opening { font-size: 12px; color: var(--text2); }
-.wx-narrative-verdict { font-size: 12px; color: var(--text2); margin-top: 1px; line-height: 1.4; }
+.wx-narrative-verdict { font-size: 12px; color: var(--text2); margin-top: 2px; line-height: 1.5; }
+
+/* ── WX TOP ── open layout, no cell-by-cell borders ── */
+.wx-top {
+  display: flex;
+  align-items: stretch;
+  min-height: 80px;
+}
+
+/* Large temperature block — left anchor */
+.wx-current {
+  padding: 12px 22px 12px 20px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 155px;
+  flex-shrink: 0;
+}
+.wx-temp  { font-size: 46px; font-weight: 300; line-height: 1; color: var(--text); letter-spacing: -1px; }
+.wx-desc  { font-size: 12px; color: var(--text2); margin-top: 3px; }
+.wx-feels { font-size: 11px; color: var(--text3); }
+.wx-loc   { font-size: 10px; color: var(--text3); margin-top: 1px; }
+
+/* Detail metrics — open flex wrap, no individual cell borders */
+.wx-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 12px 20px 12px 18px;
+  gap: 0;
+  flex: 1;
+  /* Subtle column dividers only between logical groups */
+  border-right: 1px solid var(--border);
+}
+
+.wx-detail-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 5px 20px 5px 0;
+  min-width: 115px;
+  /* No per-cell borders — open, airy feel */
+}
+
+.wx-detail-label {
+  font-size: 9px;
+  letter-spacing: .09em;
+  color: var(--text3);
+  text-transform: uppercase;
+}
+.wx-detail-val  { font-size: 14px; font-weight: 400; color: var(--text); line-height: 1.25; }
+.wx-detail-unit { font-size: 10px; color: var(--text3); }
+
+/* Sun/moon column — right side */
+.wx-right {
+  padding: 12px 18px 12px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  font-size: 11px;
+  min-width: 155px;
+  flex-shrink: 0;
+}
+.wx-sun-row { display: flex; align-items: center; gap: 7px; color: var(--text2); }
+.wx-moon    { display: flex; align-items: center; gap: 7px; color: var(--text3); font-size: 11px; margin-top: 2px; }
 
 /* ── WEATHER PANEL (scrollable strips only) ─────────────────── */
 #weather-panel { flex-shrink: 0; background: transparent; }
-
-/* ── WX TOP ─────────────────────────────────────────────────── */
-.wx-top {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: stretch;
-  min-height: 90px;
-}
-.wx-current {
-  padding: 14px 18px;
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 200px;
-}
-.wx-temp  { font-size: 40px; font-weight: 300; line-height: 1; color: var(--text); }
-.wx-desc  { font-size: 12px; color: var(--text2); }
-.wx-feels,
-.wx-loc   { font-size: 11px; color: var(--text3); }
-
-.wx-details {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0;
-}
-.wx-detail-cell {
-  padding: 12px 14px;
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  justify-content: center;
-}
-.wx-detail-cell:nth-child(4n)  { border-right: none; }
-.wx-detail-cell:nth-child(n+5) { border-bottom: none; }
-.wx-detail-label { font-size: 9px; letter-spacing: .08em; color: var(--text3); text-transform: uppercase; }
-.wx-detail-val   { font-size: 14px; font-weight: 500; color: var(--text); }
-.wx-detail-unit  { font-size: 10px; color: var(--text3); }
-
-.wx-right {
-  padding: 12px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 11px;
-  min-width: 140px;
-  border-left: 1px solid var(--border);
-}
-.wx-sun-row { display: flex; align-items: center; gap: 6px; color: var(--text2); }
-.wx-moon    { display: flex; align-items: center; gap: 6px; color: var(--text3); font-size: 11px; margin-top: 4px; }
 
 /* ── GARDEN STRIP ───────────────────────────────────────────── */
 .wx-garden-strip {
@@ -176,20 +192,21 @@ body::before {
   border-top: 1px solid var(--border);
   overflow-x: auto;
   scrollbar-width: none;
+  background: rgba(10,14,10,0.45);
 }
 .wx-garden-strip::-webkit-scrollbar { display: none; }
 
 .wx-garden-metric {
-  padding: 10px 16px;
+  padding: 9px 18px;
   border-right: 1px solid var(--border);
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 .wx-garden-metric:last-child { border-right: none; }
 .wgm-label { font-size: 9px; letter-spacing: .08em; color: var(--text3); text-transform: uppercase; }
-.wgm-val   { font-size: 16px; font-weight: 500; color: var(--text); }
+.wgm-val   { font-size: 15px; font-weight: 500; color: var(--text); }
 .wgm-val.frost  { color: #87CEEB; }
 .wgm-val.freeze { color: #6495ED; }
 .wgm-val.warn   { color: var(--amber-light); }
@@ -212,26 +229,21 @@ body::before {
   min-width: 80px;
   padding: 10px 8px;
   border-right: 1px solid var(--border);
-  border-top: 2px solid transparent;   /* reserve space; overridden per state */
+  border-top: 2px solid transparent;
   text-align: center;
   font-size: 11px;
   transition: background 0.15s;
 }
 .wx-forecast-day:last-child { border-right: none; }
 
-/* ── TODAY: subtle green tint ── */
 .wx-forecast-day.today {
   background: rgba(74, 124, 64, 0.10);
   border-top-color: rgba(74, 124, 64, 0.50);
 }
-
-/* ── FROST RISK (lo 29–32°F): light-blue tint ── */
 .wx-forecast-day.frost-risk {
   background: rgba(135, 206, 235, 0.10);
   border-top-color: rgba(135, 206, 235, 0.55);
 }
-
-/* ── FREEZE RISK (lo ≤ 28°F): bold blue tint ── */
 .wx-forecast-day.freeze-risk {
   background: rgba(100, 149, 237, 0.18);
   border-top-color: rgba(100, 149, 237, 0.70);
@@ -258,10 +270,10 @@ body::before {
 .wfd-badge.freeze { background: rgba(100,149,237,0.22); color: #7aaff0; border: 1px solid rgba(100,149,237,0.45); }
 .wfd-badge.ok     { background: rgba(74,124,64,0.18);   color: var(--green-bright); border: 1px solid rgba(74,124,64,0.3); }
 
-/* ── BODY / SIDEBAR / DETAIL ────────────────────────────────────────
+/* ── BODY / SIDEBAR / DETAIL ───────────────────────────────────
    sidebar and detail stick below BOTH header AND wx-summary.
    --sticky-h is updated live by JS after weather renders.
-   ─────────────────────────────────────────────────────────────────── */
+   ─────────────────────────────────────────────────────────────── */
 #body {
   display: flex;
   flex: 1;
@@ -648,8 +660,10 @@ td.warn { color: var(--amber-light); }
     min-height: 60vh;
   }
 
+  .wx-top         { flex-wrap: wrap; }
+  .wx-details     { padding: 8px 12px; border-right: none; border-bottom: 1px solid var(--border); }
+  .wx-detail-cell { min-width: 100px; }
   .metrics-row      { grid-template-columns: 1fr 1fr; }
-  .wx-details       { grid-template-columns: 1fr 1fr; }
   .harden-dates-row { flex-direction: column; }
   .two-col          { grid-template-columns: 1fr; }
 }
