@@ -1,15 +1,3 @@
-// Garden Tracker — Blended (Claude + GPT best-of)
-// CastIronDB125 | Bella Vista, AR
-
-const state = { config: null, plants: [], logs: { daily: [], dwc: [] } };
-const LS_KEY = 'garden-blended-v1';
-let selectedId = null;
-let currentTab = 'overview';
-let currentFilter = 'All';
-let weatherData = null;
-
-const TODAY = new Date(); TODAY.setHours(0,0,0,0);
-
 const STAGE_OPTIONS = [
   'Seeds — not yet sown','Seeds — sown, not sprouted','Just germinated / sprouted',
   'Seedling (cotyledons)','Seedling (true leaves emerging)','Early vegetative','Vegetative',
@@ -250,267 +238,125 @@ function weatherNarrative(cur, daily) {
   return { opening, verdict };
 }
 
-function renderWeather(data) {
-  const c = state.config;
-  const cur = data.current;
-  const daily = data.daily;
-  const moon = moonPhase();
 
-  const frostDate = frostSafeDate();
-  const safePlant = safePlantDate();
-  const daysToFrost = Math.ceil((frostDate - TODAY) / 86400000);
-  const daysToSafe  = Math.ceil((safePlant  - TODAY) / 86400000);
-
-  const sunrise0  = fmtTime(daily.sunrise[0]);
-  const sunset0   = fmtTime(daily.sunset[0]);
-  const daylight0 = fmtDaylight(daily.daylight_duration[0]);
-  const uvToday   = Math.round(cur.uv_index || daily.uv_index_max[0] || 0);
-  const uvCls     = uvClass(uvToday);
-  const uvLbl     = uvLabel(uvToday);
-
-  const photoperiod = (() => {
-    const [oh, om] = c.lights.on.split(':').map(Number);
-    const [fh, fm] = c.lights.off.split(':').map(Number);
-    let mins = (fh * 60 + fm) - (oh * 60 + om);
-    if(mins < 0) mins += 24 * 60;
-    return (mins / 60).toFixed(1) + 'h';
-  })();
-
+// ── WEATHER RENDERING ──────────────────────────────
+function renderWeather(cur, daily) {
   const narrative = weatherNarrative(cur, daily);
-  const panel = document.getElementById('weather-panel');
+  const panel   = document.getElementById('weather-panel');
+  const summary = document.getElementById('wx-summary');
+  if(!panel || !summary) return;
 
-  let existingBtn = document.getElementById('wx-toggle');
-  if(!existingBtn) {
-    existingBtn = document.createElement('button');
-    existingBtn.id = 'wx-toggle';
-    existingBtn.className = 'wx-collapse-btn';
-    existingBtn.setAttribute('onclick', 'toggleWeather()');
-    panel.parentNode.insertBefore(existingBtn, panel.nextSibling);
-  }
-  existingBtn.textContent = localStorage.getItem('wx-expanded') === '1' ? '▲ collapse weather' : '▼ show full weather';
-  if(localStorage.getItem('wx-expanded') === '1') panel.classList.add('wx-expanded');
+  const wind   = Math.round(cur.wind_speed_10m);
+  const deg    = cur.wind_direction_10m || 0;
+  const dirs   = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  const wDir   = dirs[Math.round(deg/22.5)%16];
+  const uvIdx  = cur.uv_index ?? 0;
+  const uvLbl  = uvIdx<3?'0 — Low':uvIdx<6?uvIdx+' — Moderate':uvIdx<8?uvIdx+' — High':uvIdx+' — Very High';
+  const uvCol  = uvIdx<3?'#6ab55a':uvIdx<6?'#b8a040':'#c47c7c';
+  const pop0   = daily.precipitation_probability_max[0]||0;
+  const precip = daily.precipitation_sum&&daily.precipitation_sum[0]!==undefined?daily.precipitation_sum[0].toFixed(2):'0.00';
+  const sunrise= (daily.sunrise||[])[0]?new Date(daily.sunrise[0]).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'--';
+  const sunset = (daily.sunset||[])[0]?new Date(daily.sunset[0]).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'--';
+  const daylight= daily.daylight_duration?(daily.daylight_duration[0]/3600).toFixed(0)+'h '+Math.round((daily.daylight_duration[0]%3600)/60)+'m':'--';
+  const lightsOn = state.config.lights&&state.config.lights.on?state.config.lights.on:'05:15';
+  const lightsOff= state.config.lights&&state.config.lights.off?state.config.lights.off:'22:45';
+  const lightHrs = (()=>{const[oh,om]=lightsOn.split(':').map(Number),[fh,fm]=lightsOff.split(':').map(Number);let d=(fh*60+fm)-(oh*60+om);if(d<0)d+=1440;return(d/60).toFixed(1);})();
+  const hiToday = Math.round(daily.temperature_2m_max[0]);
+  const loToday = Math.round(daily.temperature_2m_min[0]);
+  const icons={0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',51:'🌧',61:'🌧',65:'🌧',71:'🌨',80:'🌦',95:'⛈'};
 
-  let _stickyEl = document.getElementById('wx-sticky-header');
-  if(!_stickyEl) {
-    _stickyEl = document.createElement('div');
-    _stickyEl.id = 'wx-sticky-header';
-    panel.parentNode.insertBefore(_stickyEl, panel);
-  }
-  _stickyEl.innerHTML = `
-    <div class="wx-sticky">
+  // WX SUMMARY — sticky element, direct child of #app
+  summary.innerHTML = `
     <div class="wx-narrative">
       <div class="wx-narrative-opening">${narrative.opening}</div>
       <div class="wx-narrative-verdict">${narrative.verdict}</div>
     </div>
     <div class="wx-top">
       <div class="wx-current">
-        <div style="display:flex;align-items:flex-start;gap:10px">
-          <div class="wx-temp-big">${Math.round(cur.temperature_2m)}°</div>
-          <div style="padding-top:8px">
-            <div style="font-size:20px;line-height:1">${wxIcon(cur.weather_code)}</div>
-          </div>
-        </div>
-        <div class="wx-desc">${wxDesc(cur.weather_code)}</div>
-        <div class="wx-feels">Feels like ${Math.round(cur.apparent_temperature)}°F</div>
-        <div class="wx-feels" style="margin-top:2px">${c.locationName}</div>
+        <div class="wx-temp">${Math.round(cur.temperature_2m)}&deg;</div>
+        <div class="wx-desc">${cur.weatherDesc||'Overcast'}</div>
+        <div class="wx-feels">Feels like ${Math.round(cur.apparent_temperature)}&deg;F</div>
+        <div class="wx-loc">${state.config.locationName}</div>
       </div>
-
       <div class="wx-details">
-        <div class="wx-detail-item"><div class="wx-detail-label">Humidity</div><div class="wx-detail-val">${cur.relative_humidity_2m}%</div></div>
-        <div class="wx-detail-item"><div class="wx-detail-label">Wind</div><div class="wx-detail-val">${Math.round(cur.wind_speed_10m)} mph ${windDir(cur.wind_direction_10m)}</div></div>
-        <div class="wx-detail-item">
-          <div class="wx-detail-label">UV Index</div>
-          <div class="wx-detail-val"><span class="uv-badge ${uvCls}">${uvToday} — ${uvLbl}</span></div>
-        </div>
-        <div class="wx-detail-item"><div class="wx-detail-label">Today Hi/Lo</div><div class="wx-detail-val">${Math.round(daily.temperature_2m_max[0])}° / ${Math.round(daily.temperature_2m_min[0])}°</div></div>
-        <div class="wx-detail-item"><div class="wx-detail-label">Rain chance</div><div class="wx-detail-val">${daily.precipitation_probability_max[0] || 0}%</div></div>
-        <div class="wx-detail-item"><div class="wx-detail-label">Precipitation</div><div class="wx-detail-val">${(daily.precipitation_sum[0]||0).toFixed(2)}"</div></div>
-        <div class="wx-detail-item"><div class="wx-detail-label">Indoor lights</div><div class="wx-detail-val">${photoperiod} / day</div></div>
-        <div class="wx-detail-item"><div class="wx-detail-label">Lights schedule</div><div class="wx-detail-val">${c.lights.on} – ${c.lights.off}</div></div>
+        <div class="wx-detail-cell"><div class="wx-detail-label">Humidity</div><div class="wx-detail-val">${Math.round(cur.relative_humidity_2m)}<span class="wx-detail-unit">%</span></div></div>
+        <div class="wx-detail-cell"><div class="wx-detail-label">Wind</div><div class="wx-detail-val">${wind}<span class="wx-detail-unit"> mph ${wDir}</span></div></div>
+        <div class="wx-detail-cell"><div class="wx-detail-label">UV Index</div><div class="wx-detail-val" style="font-size:12px;color:${uvCol}">${uvLbl}</div></div>
+        <div class="wx-detail-cell"><div class="wx-detail-label">Today Hi/Lo</div><div class="wx-detail-val">${hiToday}&deg;&nbsp;/&nbsp;${loToday}&deg;</div></div>
+        <div class="wx-detail-cell"><div class="wx-detail-label">Rain Chance</div><div class="wx-detail-val">${pop0}<span class="wx-detail-unit">%</span></div></div>
+        <div class="wx-detail-cell"><div class="wx-detail-label">Precipitation</div><div class="wx-detail-val">${precip}<span class="wx-detail-unit">"</span></div></div>
+        <div class="wx-detail-cell"><div class="wx-detail-label">Indoor Lights</div><div class="wx-detail-val" style="font-size:11px">${lightHrs}h / day</div></div>
+        <div class="wx-detail-cell"><div class="wx-detail-label">Lights Schedule</div><div class="wx-detail-val" style="font-size:11px">${lightsOn} &ndash; ${lightsOff}</div></div>
       </div>
+      <div class="wx-right">
+        <div class="wx-sun-row"><span>☀️</span><span>Sunrise ${sunrise}</span></div>
+        <div class="wx-sun-row"><span>🟠</span><span>Sunset ${sunset}</span></div>
+        <div class="wx-sun-row"><span>🔵</span><span>Daylight: ${daylight}</span></div>
+        <div class="wx-moon">🌙 Moon phase<br>${cur.moonPhase||'New Moon'}</div>
+      </div>
+    </div>`;
 
-      <div class="wx-sun-moon">
-        <div class="wx-sun-row"><span class="label">☀️ Sunrise</span><span class="val">${sunrise0}</span></div>
-        <div class="wx-sun-row"><span class="label">🌅 Sunset</span><span class="val">${sunset0}</span></div>
-        <div class="wx-daylight">☀ Daylight: ${daylight0}</div>
-        <div class="wx-moon">
-          <span class="wx-moon-icon">${moon.icon}</span>
-          <div><div class="moon-label">Moon phase</div><div style="font-size:12px;color:var(--text)">${moon.name}</div></div>
-        </div>
-      </div>
-    </div>
-    </div><!-- closes wx-top -->
-    </div><!-- /wx-sticky -->
-`;
-  panel.innerHTML = `   <div class="wx-garden-strip">
-      <div class="wx-garden-metric">
-        <span class="gm-label">Last frost (conservative)</span>
-        <span class="gm-val ${daysToFrost > 0 ? 'frost' : 'good'}">${daysToFrost > 0 ? daysToFrost + 'd' : 'Passed'}</span>
-        <span class="gm-sub">~Apr ${c.frost.conservativeLastFrostDay}</span>
-      </div>
-      <div class="wx-garden-metric">
-        <span class="gm-label">Safe planting date</span>
-        <span class="gm-val ${daysToSafe > 0 ? 'safe' : 'good'}">${daysToSafe > 0 ? daysToSafe + 'd' : 'Passed'}</span>
-        <span class="gm-sub">~Apr ${c.frost.safePlantDay}</span>
-      </div>
-      <div class="wx-garden-metric">
-        <span class="gm-label">Lettuce harden start</span>
-        <span class="gm-val info">${fmtShortDate(addDays(frostDate, c.hardening.coolMoveOutOffsetDays - 7))}</span>
-        <span class="gm-sub">Cool crop — can start now</span>
-      </div>
-      <div class="wx-garden-metric">
-        <span class="gm-label">Tomato harden start</span>
-        <span class="gm-val info">${fmtShortDate(addDays(safePlant, -(10)`;
-panel.innerHTML = `
-    <div class="wx-sticky">
-    <div class="wx-narrative">
-      <div class="wx-narrative-opening">${narrative.opening}</div>
-      <div class="wx-narrative-verdict">${narrative.verdict}</div>
-    </div>
-    <div class="wx-top">
-      <div class="wx-current">
-        <div style="display:flex;align-items:flex-start;gap:10px">
-          <div class="wx-temp-big">${Math.round(cur.temperature_2m)}°</div>
-          <div style="padding-top:8px">
-            <div style="font-size:20px;line-height:1">${wxIcon(cur.weather_code)}</div>
-          </div>
-        </div>
-        <div class="wx-desc">${wxDesc(cur.weather_code)}</div>
-        <div class="wx-feels">Feels like ${Math.round(cur.apparent_temperature)}°F</div>
-        <div class="wx-feels" style="margin-top:2px">${c.locationName}</div>
-      </div>
+  // WEATHER PANEL — static, just the scrollable strips
+  const safe = new Date(state.config.safePlanting||'2026-04-27');
+  const today2 = new Date();
+  const df = d=>Math.ceil((d-today2)/86400000);
+  const fmt = d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const lettH = addDays(safe,-21), tomH = addDays(safe,-10), pepH = addDays(safe,-7);
+  const lo0 = loToday;
+  const oClass = lo0<=28?'freeze':lo0<=32?'frost':lo0<=40?'warn':'ok';
+  const oText  = lo0<=32?'Frost — inside':lo0<=40?'Marginal':lo0<=50?'OK — cover peppers':'Good to go';
+  const dfrost = Math.ceil((new Date(state.config.lastFrost||'2026-04-20')-today2)/86400000);
+  const dsafe  = df(safe);
+  const sowStart = (state.config.sowWindow&&state.config.sowWindow.start)||'Feb 16–20';
+  const sowYear  = (state.config.sowWindow&&state.config.sowWindow.year)||'2026';
 
-      <div class="wx-details">
-        <div class="wx-detail-item"><div class="wx-detail-label">Humidity</div><div class="wx-detail-val">${cur.relative_humidity_2m}%</div></div>
-        <div class="wx-detail-item"><div class="wx-detail-label">Wind</div><div class="wx-detail-val">${Math.round(cur.wind_speed_10m)} mph ${windDir(cur.wind_direction_10m)}</div></div>
-        <div class="wx-detail-item">
-          <div class="wx-detail-label">UV Index</div>
-          <div class="wx-detail-val"><span class="uv-badge ${uvCls}">${uvToday} — ${uvLbl}</span></div>
-        </div>
-        <div class="wx-detail-item"><div class="wx-detail-label">Today Hi/Lo</div><div class="wx-detail-val">${Math.round(daily.temperature_2m_max[0])}° / ${Math.round(daily.temperature_2m_min[0])}°</div></div>
-        <div class="wx-detail-item"><div class="wx-detail-label">Rain chance</div><div class="wx-detail-val">${daily.precipitation_probability_max[0] || 0}%</div></div>
-        <div class="wx-detail-item"><div class="wx-detail-label">Precipitation</div><div class="wx-detail-val">${(daily.precipitation_sum[0]||0).toFixed(2)}"</div></div>
-        <div class="wx-detail-item"><div class="wx-detail-label">Indoor lights</div><div class="wx-detail-val">${photoperiod} / day</div></div>
-        <div class="wx-detail-item"><div class="wx-detail-label">Lights schedule</div><div class="wx-detail-val">${c.lights.on} – ${c.lights.off}</div></div>
-      </div>
+  const forecastDays = daily.temperature_2m_max.map((hi,i)=>{
+    const d2=new Date(today2);d2.setDate(today2.getDate()+i);
+    const lo=Math.round(daily.temperature_2m_min[i]),h=Math.round(hi);
+    const pop=daily.precipitation_probability_max[i]||0;
+    const code=(daily.weather_code||[])[i]||0;
+    const uv=daily.uv_index_max?Math.round(daily.uv_index_max[i]):0;
+    const isFrz=lo<=28,isFrost=lo<=32,isToday=i===0;
+    const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const loC=isFrz?'freeze':isFrost?'frost':'';
+    const dayC=isToday?'today':isFrz?'freeze-risk':isFrost?'frost-risk':'';
+    const badge=isFrz?'<div class="wfd-badge freeze">FROST</div>':isFrost?'<div class="wfd-badge frost">FROST</div>':'<div class="wfd-badge ok">OK</div>';
+    const ic=icons[code]||'🌡';
+    return `<div class="wx-forecast-day ${dayC}">
+      <div class="wfd-day">${isToday?'TODAY':dayNames[d2.getDay()]}</div>
+      <div class="wfd-icon">${ic}</div>
+      <div class="wfd-hi">${h}&deg;</div>
+      <div class="wfd-lo ${loC}">${lo}&deg;</div>
+      ${pop>20?`<div class="wfd-pop">${pop}%</div>`:''}
+      <div class="wfd-uv">UV ${uv}</div>
+      ${badge}
+    </div>`;
+  }).join('');
 
-      <div class="wx-sun-moon">
-        <div class="wx-sun-row"><span class="label">☀️ Sunrise</span><span class="val">${sunrise0}</span></div>
-        <div class="wx-sun-row"><span class="label">🌅 Sunset</span><span class="val">${sunset0}</span></div>
-        <div class="wx-daylight">☀ Daylight: ${daylight0}</div>
-        <div class="wx-moon">
-          <span class="wx-moon-icon">${moon.icon}</span>
-          <div><div class="moon-label">Moon phase</div><div style="font-size:12px;color:var(--text)">${moon.name}</div></div>
-        </div>
-      </div>
-    </div>
-    </div><!-- closes wx-top -->
-    </div><!-- /wx-sticky -->
-
+  panel.innerHTML = `
+    <button class="wx-collapse-btn" onclick="toggleWeatherPanel()">&#9660; Weather details &nbsp;&mdash;&nbsp; tap to collapse</button>
     <div class="wx-garden-strip">
-      <div class="wx-garden-metric">
-        <span class="gm-label">Last frost (conservative)</span>
-        <span class="gm-val ${daysToFrost > 0 ? 'frost' : 'good'}">${daysToFrost > 0 ? daysToFrost + 'd' : 'Passed'}</span>
-        <span class="gm-sub">~Apr ${c.frost.conservativeLastFrostDay}</span>
-      </div>
-      <div class="wx-garden-metric">
-        <span class="gm-label">Safe planting date</span>
-        <span class="gm-val ${daysToSafe > 0 ? 'safe' : 'good'}">${daysToSafe > 0 ? daysToSafe + 'd' : 'Passed'}</span>
-        <span class="gm-sub">~Apr ${c.frost.safePlantDay}</span>
-      </div>
-      <div class="wx-garden-metric">
-        <span class="gm-label">Lettuce harden start</span>
-        <span class="gm-val info">${fmtShortDate(addDays(frostDate, c.hardening.coolMoveOutOffsetDays - 7))}</span>
-        <span class="gm-sub">Cool crop — can start now</span>
-      </div>
-      <div class="wx-garden-metric">
-        <span class="gm-label">Tomato harden start</span>
-        <span class="gm-val info">${fmtShortDate(addDays(safePlant, -(10)))}</span>
-        <span class="gm-sub">~10 days before safe date</span>
-      </div>
-      <div class="wx-garden-metric">
-        <span class="gm-label">Pepper harden start</span>
-        <span class="gm-val info">${fmtShortDate(addDays(safePlant, c.hardening.warmMoveOutOffsetDays - 10))}</span>
-        <span class="gm-sub">After lows stay > 55°F</span>
-      </div>
-      <div class="wx-garden-metric">
-        <span class="gm-label">Sow window</span>
-        <span class="gm-val info">Feb 16–20</span>
-        <span class="gm-sub">2026</span>
-      </div>
-      <div class="wx-garden-metric">
-        <span class="gm-label">Today outside</span>
-        <span class="gm-val ${(()=>{const l=Math.round(daily.temperature_2m_min[0]);return l<=32?'frost':l<=40?'warn':l<=50?'info':l<=55?'warn':'good';})()}">${(()=>{const l=Math.round(daily.temperature_2m_min[0]);if(l<=32)return 'Frost — inside';if(l<=40)return 'Lettuce only';if(l<=50)return 'Lettuce+Bonsai';if(l<=55)return 'Tomatoes OK';return 'All crops OK';})()}</span>
-        <span class="gm-sub">${(()=>{const l=Math.round(daily.temperature_2m_min[0]);const sr=new Date(daily.sunrise[0]).getHours();const ss=new Date(daily.sunset[0]).getHours();const f=h=>h<=12?h+':00AM':(h-12)+':00PM';if(l<=32)return 'No outdoor today';if(l<=50)return f(sr+1)+'–'+f(ss-1);return f(sr+2)+'–'+f(ss-2);})()}</span>
-      </div>
+      <div class="wx-garden-metric"><div class="wgm-label">Last Frost</div><div class="wgm-val" style="color:#87CEEB">${dfrost>0?dfrost+'d':'Past'}</div><div class="wgm-sub">≈Apr 20</div></div>
+      <div class="wx-garden-metric"><div class="wgm-label">Safe Planting</div><div class="wgm-val" style="color:var(--green-bright)">${dsafe>0?dsafe+'d':'Past'}</div><div class="wgm-sub">≈Apr 27</div></div>
+      <div class="wx-garden-metric"><div class="wgm-label">Lettuce Harden</div><div class="wgm-val">${fmt(lettH)}</div><div class="wgm-sub">-21 days</div></div>
+      <div class="wx-garden-metric"><div class="wgm-label">Tomato Harden</div><div class="wgm-val">${fmt(tomH)}</div><div class="wgm-sub">-10 days</div></div>
+      <div class="wx-garden-metric"><div class="wgm-label">Pepper Harden</div><div class="wgm-val">${fmt(pepH)}</div><div class="wgm-sub">After lows &gt;55&deg;F</div></div>
+      <div class="wx-garden-metric"><div class="wgm-label">Sow Window</div><div class="wgm-val">${sowStart}</div><div class="wgm-sub">${sowYear}</div></div>
+      <div class="wx-garden-metric"><div class="wgm-label">Today Outside</div><div class="wgm-val ${oClass}">${oText}</div><div class="wgm-sub">Based on tonight low</div></div>
     </div>
-
-    <div class="wx-forecast-strip">
-      ${daily.time.map((date, i) => {
-        const lo = Math.round(daily.temperature_2m_min[i]);
-        const hi = Math.round(daily.temperature_2m_max[i]);
-        const pop = daily.precipitation_probability_max[i] || 0;
-        const uv = Math.round(daily.uv_index_max[i] || 0);
-        const frost = lo <= 32;
-        const watch = lo > 32 && lo <= 40;
-        const statusCls = frost ? 'frost' : watch ? 'watch' : 'ok';
-        const statusLbl = frost ? 'FROST' : watch ? 'WATCH' : 'OK';
-        const d = new Date(date + 'T12:00:00');
-        const dow = i === 0 ? 'Today' : d.toLocaleDateString('en-US', {weekday:'short'});
-        return `<div class="wx-forecast-day${i===0?' today':''}${frost?' frost-risk':''}">
-          <div class="wfd-dow">${dow}</div>
-          <div class="wfd-icon">${wxIcon(daily.weather_code[i])}</div>
-          <div class="wfd-hi">${hi}°</div>
-          <div class="wfd-lo">${lo}°</div>
-          ${pop > 10 ? `<div class="wfd-pop">${pop}% 🌧</div>` : ''}
-          <div class="wfd-uv">UV ${uv}</div>
-          <div class="wfd-status ${statusCls}">${statusLbl}</div>
-        </div>`;
-      }).join('')}
-    </div>
-      `;
+    <div class="wx-forecast-strip">${forecastDays}</div>`;
 }
 
-function toggleWeather() {
-  const panel = document.getElementById('weather-panel');
-  const btn   = document.getElementById('wx-toggle');
-  const expanded = panel.classList.toggle('wx-expanded');
-  btn.textContent = expanded ? '▲ collapse weather' : '▼ show full weather';
-  localStorage.setItem('wx-expanded', expanded ? '1' : '0');
-  document.getElementById('app').classList.toggle('wx-open', expanded);
+function toggleWeatherPanel() {
+  const p = document.getElementById('weather-panel');
+  if(!p) return;
+  p.classList.toggle('expanded');
+  const btn = p.querySelector('.wx-collapse-btn');
+  if(btn) btn.innerHTML = p.classList.contains('expanded')
+    ? '&#9650; Weather details &nbsp;&mdash;&nbsp; tap to collapse'
+    : '&#9660; Weather details &nbsp;&mdash;&nbsp; tap to expand';
 }
 
-// ── DATE HELPERS ─────────────────────────────────────────────────────
-function frostSafeDate() {
-  const c = state.config.frost;
-  const now = new Date(); now.setHours(0,0,0,0);
-  let d = new Date(now.getFullYear(), c.conservativeLastFrostMonth - 1, c.conservativeLastFrostDay);
-  if(now > d) d = new Date(now.getFullYear()+1, c.conservativeLastFrostMonth-1, c.conservativeLastFrostDay);
-  return d;
-}
-function safePlantDate() {
-  const c = state.config.frost;
-  const now = new Date(); now.setHours(0,0,0,0);
-  let d = new Date(now.getFullYear(), c.safePlantMonth - 1, c.safePlantDay);
-  if(now > d) d = new Date(now.getFullYear()+1, c.safePlantMonth-1, c.safePlantDay);
-  return d;
-}
-function addDays(date, n) { const d = new Date(date); d.setDate(d.getDate()+n); return d; }
-function daysSince(s) { if(!s) return null; return Math.floor((TODAY - new Date(s+'T00:00:00')) / 86400000); }
-function daysUntil(d) { return Math.ceil((d - TODAY) / 86400000); }
-function fmtDate(s)    { return new Date(s+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
-function fmtShortDate(d){ return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
-function isoToday()    { return TODAY.toISOString().split('T')[0]; }
-function nowStr()      { return new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
-
-function cat(p) {
-  if(p.system==='DWC')    return 'DWC';
-  if(p.system==='Bonsai') return 'Bonsai';
-  if(p.category==='Uncertain Seed') return 'Uncertain';
-  return 'Soil';
-}
-
-// ── SIDEBAR ──────────────────────────────────────────────────────────
 function renderSidebar() {
   const filters = ['All','DWC','Soil','Bonsai','Uncertain','Harden Off'];
   document.getElementById('filter-bar').innerHTML = filters.map(f =>
