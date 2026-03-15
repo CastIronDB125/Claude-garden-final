@@ -379,6 +379,7 @@ function renderWeather(data) {
   if(localStorage.getItem('wx-expanded') === '1') panel.classList.add('wx-expanded');
 
   panel.innerHTML = `
+    <div class="wx-sticky">
     <div class="wx-narrative">
       <div class="wx-narrative-opening">${narrative.opening}</div>
       <div class="wx-narrative-verdict">${narrative.verdict}</div>
@@ -420,6 +421,7 @@ function renderWeather(data) {
         </div>
       </div>
     </div>
+    </div><!-- /wx-sticky -->
 
     <div class="wx-garden-strip">
       <div class="wx-garden-metric">
