@@ -477,15 +477,8 @@ function renderWeather(data) {
         </div>`;
       }).join('')}
     </div>
-    ${hourlyHTML}
-    <button class="wx-collapse-btn" id="wx-toggle" onclick="toggleWeather()">▲ collapse weather</button>
+        ${hourlyHTML}
   `;
-  // Restore expanded state if previously set
-  if(localStorage.getItem('wx-expanded') === '1') {
-    panel.classList.add('wx-expanded');
-    const btn = document.getElementById('wx-toggle');
-    if(btn) btn.textContent = '▲ collapse weather';
-  }
 }
 
 function toggleWeather() {
