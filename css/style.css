@@ -37,7 +37,7 @@
   --weather-h:   auto;
 }
 
-html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--mono); font-size: 13px; line-height: 1.5; overflow: hidden; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--mono); font-size: 13px; line-height: 1.5; }
 
 /* ── SCROLLBARS ────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -45,13 +45,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
 /* ── APP SHELL ─────────────────────────────── */
-#app { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+#app { display: flex; flex-direction: column; min-height: 100vh; }
 
 /* ── TOP HEADER ────────────────────────────── */
 #top-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 18px; height: var(--header-h); min-height: var(--header-h);
   border-bottom: 1px solid var(--border); background: var(--bg2); flex-shrink: 0;
+  position: sticky; top: 0; z-index: 100;
 }
 #top-header h1 { font-family: var(--serif); font-size: 16px; font-weight: 500; color: var(--green); }
 #top-header p  { font-size: 11px; color: var(--text3); margin-top: 1px; }
@@ -61,14 +62,21 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 
 /* ── WEATHER PANEL ─────────────────────────── */
 #weather-panel {
-  flex-shrink: 0; background: var(--bg2); border-bottom: 1px solid var(--border);
-  overflow-y: auto; max-height: 52vh;
+  flex-shrink: 0; background: var(--bg2);
+  overflow-y: visible; max-height: none;
 }
 #weather-panel::-webkit-scrollbar { height: 3px; }
 
 .wx-top {
   display: grid; grid-template-columns: auto 1fr auto;
   gap: 0; align-items: stretch; min-height: 90px;
+}
+.wx-sticky {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 90;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
 }
 
 .wx-current {
@@ -151,13 +159,14 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .uv-vhigh  { background: #2a0a2a; color: var(--purple); }
 
 /* ── BODY ──────────────────────────────────── */
-#body { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+#body { display: flex; min-height: calc(100vh - var(--header-h) - 52px); }
 
 /* ── SIDEBAR ───────────────────────────────── */
 #sidebar {
   width: var(--sidebar-w); min-width: var(--sidebar-w);
   display: flex; flex-direction: column;
   border-right: 1px solid var(--border); background: var(--bg2); overflow: hidden;
+  position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); align-self: flex-start;
 }
 #filter-bar {
   display: flex; gap: 4px; padding: 9px 12px; flex-wrap: wrap;
@@ -196,7 +205,8 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .badge-nickname      { background: var(--bg4);       color: var(--text2);  border: 1px solid var(--border2); }
 
 /* ── DETAIL PANEL ──────────────────────────── */
-#detail { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+#detail { flex: 1; display: flex; flex-direction: column; overflow: hidden;
+  position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); }
 .empty-detail { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 13px; }
 
 #detail-header {
