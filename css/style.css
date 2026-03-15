@@ -62,7 +62,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 /* ── WEATHER PANEL ─────────────────────────── */
 #weather-panel {
   flex-shrink: 0; background: var(--bg2); border-bottom: 1px solid var(--border);
-  overflow-y: visible; max-height: none;
+  overflow-y: auto; max-height: 52vh;
 }
 #weather-panel::-webkit-scrollbar { height: 3px; }
 
@@ -383,6 +383,8 @@ select option { background: var(--bg3); }
   html, body { overflow: hidden; }
   #app { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
   #app.wx-open { height: auto; min-height: 100dvh; overflow-y: auto; }
+  body:has(#app.wx-open) { overflow-y: auto !important; }
+  html:has(#app.wx-open) { overflow-y: auto !important; }
 
   /* ── Header compact ── */
   #top-header { padding: 0 12px; min-height: 44px; }
