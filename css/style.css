@@ -178,13 +178,13 @@ body::before {
 .uv-vhigh  { background: #2a0a2a; color: var(--purple); }
 
 /* ── BODY ──────────────────────────────────── */
-#body { display: flex; }
+#body { display: flex; min-height: calc(100vh - var(--header-h)); }
 
 /* ── SIDEBAR ───────────────────────────────── */
 #sidebar {
   width: var(--sidebar-w); min-width: var(--sidebar-w);
   display: flex; flex-direction: column;
-  border-right: 1px solid var(--border); background: var(--bg2); overflow: hidden;
+  border-right: 1px solid var(--border); background: var(--bg2); overflow-y: auto;
   position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); align-self: flex-start;
 }
 #filter-bar {
@@ -448,6 +448,9 @@ select option { background: var(--bg3); }
   /* ── App shell — natural scroll on mobile ── */
   html, body { overflow-x: hidden; }
   #app { min-height: 100dvh; display: flex; flex-direction: column; }
+  #body    { flex-direction: column; min-height: 0; }
+  #sidebar { position: static !important; height: auto !important; max-height: 220px; overflow-y: auto !important; border-right: none; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  #detail  { position: static !important; height: auto !important; overflow: visible !important; flex: 1; min-height: 60vh; }
 
   /* ── Header compact ── */
   #top-header { padding: 0 12px; min-height: 44px; }
