@@ -290,7 +290,78 @@ function renderWeather(data) {
   existingBtn.textContent = localStorage.getItem('wx-expanded') === '1' ? '▲ collapse weather' : '▼ show full weather';
   if(localStorage.getItem('wx-expanded') === '1') panel.classList.add('wx-expanded');
 
-  panel.innerHTML = `
+  let _stickyEl = document.getElementById('wx-sticky-header');
+  if(!_stickyEl) {
+    _stickyEl = document.createElement('div');
+    _stickyEl.id = 'wx-sticky-header';
+    panel.parentNode.insertBefore(_stickyEl, panel);
+  }
+  _stickyEl.innerHTML = `
+    <div class="wx-sticky">
+    <div class="wx-narrative">
+      <div class="wx-narrative-opening">${narrative.opening}</div>
+      <div class="wx-narrative-verdict">${narrative.verdict}</div>
+    </div>
+    <div class="wx-top">
+      <div class="wx-current">
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <div class="wx-temp-big">${Math.round(cur.temperature_2m)}°</div>
+          <div style="padding-top:8px">
+            <div style="font-size:20px;line-height:1">${wxIcon(cur.weather_code)}</div>
+          </div>
+        </div>
+        <div class="wx-desc">${wxDesc(cur.weather_code)}</div>
+        <div class="wx-feels">Feels like ${Math.round(cur.apparent_temperature)}°F</div>
+        <div class="wx-feels" style="margin-top:2px">${c.locationName}</div>
+      </div>
+
+      <div class="wx-details">
+        <div class="wx-detail-item"><div class="wx-detail-label">Humidity</div><div class="wx-detail-val">${cur.relative_humidity_2m}%</div></div>
+        <div class="wx-detail-item"><div class="wx-detail-label">Wind</div><div class="wx-detail-val">${Math.round(cur.wind_speed_10m)} mph ${windDir(cur.wind_direction_10m)}</div></div>
+        <div class="wx-detail-item">
+          <div class="wx-detail-label">UV Index</div>
+          <div class="wx-detail-val"><span class="uv-badge ${uvCls}">${uvToday} — ${uvLbl}</span></div>
+        </div>
+        <div class="wx-detail-item"><div class="wx-detail-label">Today Hi/Lo</div><div class="wx-detail-val">${Math.round(daily.temperature_2m_max[0])}° / ${Math.round(daily.temperature_2m_min[0])}°</div></div>
+        <div class="wx-detail-item"><div class="wx-detail-label">Rain chance</div><div class="wx-detail-val">${daily.precipitation_probability_max[0] || 0}%</div></div>
+        <div class="wx-detail-item"><div class="wx-detail-label">Precipitation</div><div class="wx-detail-val">${(daily.precipitation_sum[0]||0).toFixed(2)}"</div></div>
+        <div class="wx-detail-item"><div class="wx-detail-label">Indoor lights</div><div class="wx-detail-val">${photoperiod} / day</div></div>
+        <div class="wx-detail-item"><div class="wx-detail-label">Lights schedule</div><div class="wx-detail-val">${c.lights.on} – ${c.lights.off}</div></div>
+      </div>
+
+      <div class="wx-sun-moon">
+        <div class="wx-sun-row"><span class="label">☀️ Sunrise</span><span class="val">${sunrise0}</span></div>
+        <div class="wx-sun-row"><span class="label">🌅 Sunset</span><span class="val">${sunset0}</span></div>
+        <div class="wx-daylight">☀ Daylight: ${daylight0}</div>
+        <div class="wx-moon">
+          <span class="wx-moon-icon">${moon.icon}</span>
+          <div><div class="moon-label">Moon phase</div><div style="font-size:12px;color:var(--text)">${moon.name}</div></div>
+        </div>
+      </div>
+    </div>
+    </div><!-- closes wx-top -->
+    </div><!-- /wx-sticky -->
+`;
+  panel.innerHTML = `   <div class="wx-garden-strip">
+      <div class="wx-garden-metric">
+        <span class="gm-label">Last frost (conservative)</span>
+        <span class="gm-val ${daysToFrost > 0 ? 'frost' : 'good'}">${daysToFrost > 0 ? daysToFrost + 'd' : 'Passed'}</span>
+        <span class="gm-sub">~Apr ${c.frost.conservativeLastFrostDay}</span>
+      </div>
+      <div class="wx-garden-metric">
+        <span class="gm-label">Safe planting date</span>
+        <span class="gm-val ${daysToSafe > 0 ? 'safe' : 'good'}">${daysToSafe > 0 ? daysToSafe + 'd' : 'Passed'}</span>
+        <span class="gm-sub">~Apr ${c.frost.safePlantDay}</span>
+      </div>
+      <div class="wx-garden-metric">
+        <span class="gm-label">Lettuce harden start</span>
+        <span class="gm-val info">${fmtShortDate(addDays(frostDate, c.hardening.coolMoveOutOffsetDays - 7))}</span>
+        <span class="gm-sub">Cool crop — can start now</span>
+      </div>
+      <div class="wx-garden-metric">
+        <span class="gm-label">Tomato harden start</span>
+        <span class="gm-val info">${fmtShortDate(addDays(safePlant, -(10)`;
+panel.innerHTML = `
     <div class="wx-sticky">
     <div class="wx-narrative">
       <div class="wx-narrative-opening">${narrative.opening}</div>
