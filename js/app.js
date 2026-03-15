@@ -333,6 +333,7 @@ function renderWeather(data) {
         </div>
       </div>
     </div>
+    </div><!-- closes wx-top -->
     </div><!-- /wx-sticky -->
 
     <div class="wx-garden-strip">
@@ -971,7 +972,16 @@ function logWater(id, type) {
 
 // ── EXPORT / IMPORT ───────────────────────────────────────────────────
 function exportData() {
-  const blob = new Blob([JSON.stringify(state.logs, null, 2)], {type:'application/json'});
+  const exportObj = {
+    logs: state.logs,
+    plantMutables: state.plants.map(p => ({
+      id: p.id,
+      _notes: p._notes, _feeds: p._feeds, _phLog: p._phLog, _ecLog: p._ecLog,
+      _waterLog: p._waterLog, _photos: p._photos, _hardenStart: p._hardenStart,
+      _stage: p._stage, _lightHours: p._lightHours
+    }))
+  };
+  const blob = new Blob([JSON.stringify(exportObj, null, 2)], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `garden-blended-backup-${isoToday()}.json`;
