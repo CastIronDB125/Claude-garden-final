@@ -1,4 +1,4 @@
-// Garden Tracker — Blended (Claude + GPT best-of)
+// Garden Tracker â Blended (Claude + GPT best-of)
 // CastIronDB125 | Bella Vista, AR
 
 const state = { config: null, plants: [], logs: { daily: [], dwc: [] } };
@@ -11,26 +11,26 @@ let weatherData = null;
 const TODAY = new Date(); TODAY.setHours(0,0,0,0);
 
 const STAGE_OPTIONS = [
-  'Seeds — not yet sown','Seeds — sown, not sprouted','Just germinated / sprouted',
+  'Seeds â not yet sown','Seeds â sown, not sprouted','Just germinated / sprouted',
   'Seedling (cotyledons)','Seedling (true leaves emerging)','Early vegetative','Vegetative',
   'Pre-flowering','Flowering','Fruiting','Ready to harvest','Hardening off',
-  'Transplanted outdoors','DWC — net pot placed','DWC — roots reaching water','DWC — established'
+  'Transplanted outdoors','DWC â net pot placed','DWC â roots reaching water','DWC â established'
 ];
 
 const HARDEN_SCHEDULE = [
-  {day:1, hours:1,  shade:true,  notes:'Dappled shade only — no direct sun'},
+  {day:1, hours:1,  shade:true,  notes:'Dappled shade only â no direct sun'},
   {day:2, hours:2,  shade:true,  notes:'Dappled shade; bring in if wind > 10mph'},
   {day:3, hours:3,  shade:false, notes:'Morning sun OK; avoid afternoon direct'},
   {day:4, hours:4,  shade:false, notes:'Morning sun + 1h afternoon max'},
   {day:5, hours:5,  shade:false, notes:'Increasing direct sun'},
   {day:6, hours:6,  shade:false, notes:'Half-day sun'},
-  {day:7, hours:8,  shade:false, notes:'Full day OK if overnight lows > 50°F'},
+  {day:7, hours:8,  shade:false, notes:'Full day OK if overnight lows > 50Â°F'},
   {day:8, hours:10, shade:false, notes:'Near-full outdoor exposure'},
-  {day:9, hours:12, shade:false, notes:'Full sun — check frost forecast'},
-  {day:10,hours:14, shade:false, notes:'Full outdoor — ready to transplant if frost-free'}
+  {day:9, hours:12, shade:false, notes:'Full sun â check frost forecast'},
+  {day:10,hours:14, shade:false, notes:'Full outdoor â ready to transplant if frost-free'}
 ];
 
-// ── INIT ────────────────────────────────────────────────────────────
+// ââ INIT ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 async function init() {
   try {
     const [config, plants] = await Promise.all([
@@ -49,7 +49,7 @@ async function init() {
   }
 }
 
-// ── LOGS (localStorage) ─────────────────────────────────────────────
+// ââ LOGS (localStorage) âââââââââââââââââââââââââââââââââââââââââââââ
 function loadLogs() {
   try { const r = localStorage.getItem(LS_KEY); if(r) state.logs = JSON.parse(r); }
   catch(e) { state.logs = {daily:[], dwc:[]}; }
@@ -128,7 +128,7 @@ function flashSave() {
   el._t = setTimeout(() => el.classList.remove('show'), 2000);
 }
 
-// ── WEATHER ─────────────────────────────────────────────────────────
+// ââ WEATHER âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 async function fetchWeather() {
   const c = state.config;
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${c.latitude}&longitude=${c.longitude}` +
@@ -142,7 +142,7 @@ async function fetchWeather() {
     renderWeather(data);
     if(currentTab === 'harden off') renderTab();
   } catch(e) {
-    document.getElementById('weather-panel').innerHTML = '<div style="padding:14px 18px;color:var(--text3);font-size:12px">Weather unavailable — check connection.</div>';
+    document.getElementById('weather-panel').innerHTML = '<div style="padding:14px 18px;color:var(--text3);font-size:12px">Weather unavailable â check connection.</div>';
   }
 }
 
@@ -155,24 +155,24 @@ function moonPhase() {
   const JDE = 2451550.09766 + 29.530588861 * k + 0.00015437 * T*T;
   const phase = ((JDE - 2451550.09766) % 29.530588861) / 29.530588861;
   const p = ((phase % 1) + 1) % 1;
-  if(p < 0.0625 || p >= 0.9375) return {icon:'🌑', name:'New Moon'};
-  if(p < 0.1875) return {icon:'🌒', name:'Waxing Crescent'};
-  if(p < 0.3125) return {icon:'🌓', name:'First Quarter'};
-  if(p < 0.4375) return {icon:'🌔', name:'Waxing Gibbous'};
-  if(p < 0.5625) return {icon:'🌕', name:'Full Moon'};
-  if(p < 0.6875) return {icon:'🌖', name:'Waning Gibbous'};
-  if(p < 0.8125) return {icon:'🌗', name:'Last Quarter'};
-  return {icon:'🌘', name:'Waning Crescent'};
+  if(p < 0.0625 || p >= 0.9375) return {icon:'ð', name:'New Moon'};
+  if(p < 0.1875) return {icon:'ð', name:'Waxing Crescent'};
+  if(p < 0.3125) return {icon:'ð', name:'First Quarter'};
+  if(p < 0.4375) return {icon:'ð', name:'Waxing Gibbous'};
+  if(p < 0.5625) return {icon:'ð', name:'Full Moon'};
+  if(p < 0.6875) return {icon:'ð', name:'Waning Gibbous'};
+  if(p < 0.8125) return {icon:'ð', name:'Last Quarter'};
+  return {icon:'ð', name:'Waning Crescent'};
 }
 
 function wxIcon(code) {
-  if(code === 0) return '☀️';
-  if(code <= 2) return '⛅';
-  if(code <= 45) return '☁️';
-  if(code <= 67) return '🌧️';
-  if(code <= 77) return '🌨️';
-  if(code <= 82) return '🌦️';
-  return '⛈️';
+  if(code === 0) return 'âï¸';
+  if(code <= 2) return 'â';
+  if(code <= 45) return 'âï¸';
+  if(code <= 67) return 'ð§ï¸';
+  if(code <= 77) return 'ð¨ï¸';
+  if(code <= 82) return 'ð¦ï¸';
+  return 'âï¸';
 }
 
 function wxDesc(code) {
@@ -219,7 +219,7 @@ function fmtDaylight(seconds) {
   return `${h}h ${m}m`;
 }
 
-// ── WEATHER NARRATIVE ────────────────────────────────────────────────
+// ââ WEATHER NARRATIVE ââââââââââââââââââââââââââââââââââââââââââââââââ
 function weatherNarrative(cur, daily) {
   const temp   = Math.round(cur.temperature_2m);
   const feels  = Math.round(cur.apparent_temperature);
@@ -233,32 +233,32 @@ function weatherNarrative(cur, daily) {
     code <= 45 ? 'Foggy' : code <= 55 ? 'Drizzle' : code <= 67 ? 'Rainy' :
     code <= 77 ? 'Snowing' : 'Stormy';
 
-  let opening = `${condition} now, ${temp}°F`;
-  if(Math.abs(temp - feels) >= 4) opening += ` with a feels-like of ${feels}°F`;
-  opening += `. Tonight bottoms out near ${lo}°F`;
+  let opening = `${condition} now, ${temp}Â°F`;
+  if(Math.abs(temp - feels) >= 4) opening += ` with a feels-like of ${feels}Â°F`;
+  opening += `. Tonight bottoms out near ${lo}Â°F`;
   if(wind > 15) opening += `, winds ${wind} mph`;
   opening += '.';
 
   let verdict = '';
   if(lo <= 32) {
-    verdict = 'Frost risk tonight — keep everything inside. No hardening today.';
+    verdict = 'Frost risk tonight â keep everything inside. No hardening today.';
   } else if(lo <= 40) {
-    verdict = `Watch night: ${lo}°F is too cold for tomatoes and peppers. Lettuce and bonsai only if the day is calm.`;
+    verdict = `Watch night: ${lo}Â°F is too cold for tomatoes and peppers. Lettuce and bonsai only if the day is calm.`;
   } else if(lo <= 50) {
     verdict = `Reasonable day for lettuce or hardy bonsai exposure. Too cold tonight for tomatoes and peppers.`;
   } else if(lo <= 55) {
-    verdict = `Good for lettuce and tomato hardening. Peppers and superhots still want warmer nights — hold off.`;
+    verdict = `Good for lettuce and tomato hardening. Peppers and superhots still want warmer nights â hold off.`;
   } else {
     verdict = `Good conditions across the board. Peppers can go out on schedule. Monitor wind.`;
   }
 
-  if(pop > 60) verdict += ` Rain likely (${pop}%) — skip outdoor sessions today.`;
-  else if(pop > 30) verdict += ` Rain chance ${pop}% — check forecast before going out.`;
+  if(pop > 60) verdict += ` Rain likely (${pop}%) â skip outdoor sessions today.`;
+  else if(pop > 30) verdict += ` Rain chance ${pop}% â check forecast before going out.`;
 
   return { opening, verdict };
 }
 
-// ── HOURLY HARDENING WINDOW ───────────────────────────────────────────
+// ââ HOURLY HARDENING WINDOW âââââââââââââââââââââââââââââââââââââââââââ
 function renderHourlyWindow(cur, daily, sunrise, sunset) {
   const lo      = Math.round(daily.temperature_2m_min[0]);
   const hi      = Math.round(daily.temperature_2m_max[0]);
@@ -272,51 +272,51 @@ function renderHourlyWindow(cur, daily, sunrise, sunset) {
       name: 'Lettuce', minNight: 28, color: 'var(--green)',
       outdoorStart: srHour + 1,
       outdoorEnd:   ssHour - 1,
-      waterWindow:  '6–8 AM or 5–7 PM',
+      waterWindow:  '6â8 AM or 5â7 PM',
       bringIn:      `${ssHour - 1}:00`,
-      note:         lo < 28 ? 'Too cold tonight — skip.' : 'Cold-tolerant. Most flexible schedule.'
+      note:         lo < 28 ? 'Too cold tonight â skip.' : 'Cold-tolerant. Most flexible schedule.'
     },
     {
       name: 'Tomatoes', minNight: 50, color: 'var(--red)',
       outdoorStart: srHour + 2,
       outdoorEnd:   ssHour - 2,
-      waterWindow:  '7–9 AM or 4–6 PM',
+      waterWindow:  '7â9 AM or 4â6 PM',
       bringIn:      `${ssHour - 2}:00`,
-      note:         lo < 50 ? `${lo}°F tonight — too cold. Skip outdoor exposure.` : 'Good to harden today.'
+      note:         lo < 50 ? `${lo}Â°F tonight â too cold. Skip outdoor exposure.` : 'Good to harden today.'
     },
     {
       name: 'Peppers', minNight: 55, color: 'var(--amber)',
       outdoorStart: srHour + 3,
       outdoorEnd:   ssHour - 3,
-      waterWindow:  '8–10 AM or 3–5 PM',
+      waterWindow:  '8â10 AM or 3â5 PM',
       bringIn:      `${ssHour - 3}:00`,
-      note:         lo < 55 ? `${lo}°F tonight — too cold for peppers (need 55°F+). Stay inside.` : 'Safe to harden today.'
+      note:         lo < 55 ? `${lo}Â°F tonight â too cold for peppers (need 55Â°F+). Stay inside.` : 'Safe to harden today.'
     },
     {
       name: 'Superhots', minNight: 60, color: 'var(--purple)',
       outdoorStart: srHour + 3,
       outdoorEnd:   ssHour - 3,
-      waterWindow:  '8–10 AM',
+      waterWindow:  '8â10 AM',
       bringIn:      `${ssHour - 3}:00`,
-      note:         lo < 60 ? `${lo}°F tonight — superhots want 60°F+. Keep inside.` : 'Safe window today.'
+      note:         lo < 60 ? `${lo}Â°F tonight â superhots want 60Â°F+. Keep inside.` : 'Safe window today.'
     },
     {
       name: 'Bonsai', minNight: 32, color: 'var(--blue)',
       outdoorStart: srHour + 1,
       outdoorEnd:   ssHour - 2,
-      waterWindow:  '7–9 AM',
+      waterWindow:  '7â9 AM',
       bringIn:      `${ssHour - 2}:00`,
-      note:         lo < 32 ? 'Frost risk — inside only.' : 'Can handle today\'s conditions. Watch watering.'
+      note:         lo < 32 ? 'Frost risk â inside only.' : 'Can handle today\'s conditions. Watch watering.'
     }
   ];
 
-  const windWarn = wind > 20 ? `<div class="hourly-wind-warn">⚠ Wind ${wind} mph — reduce outdoor time for all crops. Seedlings especially vulnerable.</div>` : '';
+  const windWarn = wind > 20 ? `<div class="hourly-wind-warn">â  Wind ${wind} mph â reduce outdoor time for all crops. Seedlings especially vulnerable.</div>` : '';
 
   return `
     <div class="hourly-window">
       <div class="hourly-header">
         <span class="hourly-title">Today's outdoor window</span>
-        <span class="hourly-sub">Sunrise ${fmtTime(sunrise)} · Sunset ${fmtTime(sunset)} · Hi ${hi}° / Lo ${lo}°</span>
+        <span class="hourly-sub">Sunrise ${fmtTime(sunrise)} Â· Sunset ${fmtTime(sunset)} Â· Hi ${hi}Â° / Lo ${lo}Â°</span>
       </div>
       ${windWarn}
       <div class="hourly-grid">
@@ -326,8 +326,8 @@ function renderHourlyWindow(cur, daily, sunrise, sunset) {
           const endFmt   = cr.outdoorEnd   <= 12 ? cr.outdoorEnd   + ':00 AM' : (cr.outdoorEnd   - 12) + ':00 PM';
           return `<div class="hourly-crop ${ok?'ok':'blocked'}">
             <div class="hc-name" style="color:${cr.color}">${cr.name}</div>
-            <div class="hc-window">${ok ? startFmt + ' – ' + endFmt : 'Indoor only'}</div>
-            <div class="hc-water">💧 ${cr.waterWindow}</div>
+            <div class="hc-window">${ok ? startFmt + ' â ' + endFmt : 'Indoor only'}</div>
+            <div class="hc-water">ð§ ${cr.waterWindow}</div>
             <div class="hc-note">${cr.note}</div>
           </div>`;
         }).join('')}
@@ -366,6 +366,18 @@ function renderWeather(data) {
   const hourlyHTML = renderHourlyWindow(cur, daily, daily.sunrise[0], daily.sunset[0]);
 
   const panel = document.getElementById('weather-panel');
+
+  let existingBtn = document.getElementById('wx-toggle');
+  if(!existingBtn) {
+    existingBtn = document.createElement('button');
+    existingBtn.id = 'wx-toggle';
+    existingBtn.className = 'wx-collapse-btn';
+    existingBtn.setAttribute('onclick', 'toggleWeather()');
+    panel.parentNode.insertBefore(existingBtn, panel.nextSibling);
+  }
+  existingBtn.textContent = localStorage.getItem('wx-expanded') === '1' ? '▲ collapse weather' : '▼ show full weather';
+  if(localStorage.getItem('wx-expanded') === '1') panel.classList.add('wx-expanded');
+
   panel.innerHTML = `
     <div class="wx-narrative">
       <div class="wx-narrative-opening">${narrative.opening}</div>
@@ -374,13 +386,13 @@ function renderWeather(data) {
     <div class="wx-top">
       <div class="wx-current">
         <div style="display:flex;align-items:flex-start;gap:10px">
-          <div class="wx-temp-big">${Math.round(cur.temperature_2m)}°</div>
+          <div class="wx-temp-big">${Math.round(cur.temperature_2m)}Â°</div>
           <div style="padding-top:8px">
             <div style="font-size:20px;line-height:1">${wxIcon(cur.weather_code)}</div>
           </div>
         </div>
         <div class="wx-desc">${wxDesc(cur.weather_code)}</div>
-        <div class="wx-feels">Feels like ${Math.round(cur.apparent_temperature)}°F</div>
+        <div class="wx-feels">Feels like ${Math.round(cur.apparent_temperature)}Â°F</div>
         <div class="wx-feels" style="margin-top:2px">${c.locationName}</div>
       </div>
 
@@ -389,19 +401,19 @@ function renderWeather(data) {
         <div class="wx-detail-item"><div class="wx-detail-label">Wind</div><div class="wx-detail-val">${Math.round(cur.wind_speed_10m)} mph ${windDir(cur.wind_direction_10m)}</div></div>
         <div class="wx-detail-item">
           <div class="wx-detail-label">UV Index</div>
-          <div class="wx-detail-val"><span class="uv-badge ${uvCls}">${uvToday} — ${uvLbl}</span></div>
+          <div class="wx-detail-val"><span class="uv-badge ${uvCls}">${uvToday} â ${uvLbl}</span></div>
         </div>
-        <div class="wx-detail-item"><div class="wx-detail-label">Today Hi/Lo</div><div class="wx-detail-val">${Math.round(daily.temperature_2m_max[0])}° / ${Math.round(daily.temperature_2m_min[0])}°</div></div>
+        <div class="wx-detail-item"><div class="wx-detail-label">Today Hi/Lo</div><div class="wx-detail-val">${Math.round(daily.temperature_2m_max[0])}Â° / ${Math.round(daily.temperature_2m_min[0])}Â°</div></div>
         <div class="wx-detail-item"><div class="wx-detail-label">Rain chance</div><div class="wx-detail-val">${daily.precipitation_probability_max[0] || 0}%</div></div>
         <div class="wx-detail-item"><div class="wx-detail-label">Precipitation</div><div class="wx-detail-val">${(daily.precipitation_sum[0]||0).toFixed(2)}"</div></div>
         <div class="wx-detail-item"><div class="wx-detail-label">Indoor lights</div><div class="wx-detail-val">${photoperiod} / day</div></div>
-        <div class="wx-detail-item"><div class="wx-detail-label">Lights schedule</div><div class="wx-detail-val">${c.lights.on} – ${c.lights.off}</div></div>
+        <div class="wx-detail-item"><div class="wx-detail-label">Lights schedule</div><div class="wx-detail-val">${c.lights.on} â ${c.lights.off}</div></div>
       </div>
 
       <div class="wx-sun-moon">
-        <div class="wx-sun-row"><span class="label">☀️ Sunrise</span><span class="val">${sunrise0}</span></div>
-        <div class="wx-sun-row"><span class="label">🌅 Sunset</span><span class="val">${sunset0}</span></div>
-        <div class="wx-daylight">☀ Daylight: ${daylight0}</div>
+        <div class="wx-sun-row"><span class="label">âï¸ Sunrise</span><span class="val">${sunrise0}</span></div>
+        <div class="wx-sun-row"><span class="label">ð Sunset</span><span class="val">${sunset0}</span></div>
+        <div class="wx-daylight">â Daylight: ${daylight0}</div>
         <div class="wx-moon">
           <span class="wx-moon-icon">${moon.icon}</span>
           <div><div class="moon-label">Moon phase</div><div style="font-size:12px;color:var(--text)">${moon.name}</div></div>
@@ -423,7 +435,7 @@ function renderWeather(data) {
       <div class="wx-garden-metric">
         <span class="gm-label">Lettuce harden start</span>
         <span class="gm-val info">${fmtShortDate(addDays(frostDate, c.hardening.coolMoveOutOffsetDays - 7))}</span>
-        <span class="gm-sub">Cool crop — can start now</span>
+        <span class="gm-sub">Cool crop â can start now</span>
       </div>
       <div class="wx-garden-metric">
         <span class="gm-label">Tomato harden start</span>
@@ -433,11 +445,11 @@ function renderWeather(data) {
       <div class="wx-garden-metric">
         <span class="gm-label">Pepper harden start</span>
         <span class="gm-val info">${fmtShortDate(addDays(safePlant, c.hardening.warmMoveOutOffsetDays - 10))}</span>
-        <span class="gm-sub">After lows stay > 55°F</span>
+        <span class="gm-sub">After lows stay > 55Â°F</span>
       </div>
       <div class="wx-garden-metric">
         <span class="gm-label">Sow window</span>
-        <span class="gm-val info">Feb 16–20</span>
+        <span class="gm-val info">Feb 16â20</span>
         <span class="gm-sub">2026</span>
       </div>
     </div>
@@ -457,22 +469,22 @@ function renderWeather(data) {
         return `<div class="wx-forecast-day${i===0?' today':''}${frost?' frost-risk':''}">
           <div class="wfd-dow">${dow}</div>
           <div class="wfd-icon">${wxIcon(daily.weather_code[i])}</div>
-          <div class="wfd-hi">${hi}°</div>
-          <div class="wfd-lo">${lo}°</div>
-          ${pop > 10 ? `<div class="wfd-pop">${pop}% 🌧</div>` : ''}
+          <div class="wfd-hi">${hi}Â°</div>
+          <div class="wfd-lo">${lo}Â°</div>
+          ${pop > 10 ? `<div class="wfd-pop">${pop}% ð§</div>` : ''}
           <div class="wfd-uv">UV ${uv}</div>
           <div class="wfd-status ${statusCls}">${statusLbl}</div>
         </div>`;
       }).join('')}
     </div>
     ${hourlyHTML}
-    <button class="wx-collapse-btn" id="wx-toggle" onclick="toggleWeather()">▲ collapse weather</button>
+    <button class="wx-collapse-btn" id="wx-toggle" onclick="toggleWeather()">â² collapse weather</button>
   `;
   // Restore expanded state if previously set
   if(localStorage.getItem('wx-expanded') === '1') {
     panel.classList.add('wx-expanded');
     const btn = document.getElementById('wx-toggle');
-    if(btn) btn.textContent = '▲ collapse weather';
+    if(btn) btn.textContent = 'â² collapse weather';
   }
 }
 
@@ -480,11 +492,11 @@ function toggleWeather() {
   const panel = document.getElementById('weather-panel');
   const btn   = document.getElementById('wx-toggle');
   const expanded = panel.classList.toggle('wx-expanded');
-  btn.textContent = expanded ? '▲ collapse weather' : '▼ show full weather';
+  btn.textContent = expanded ? 'â² collapse weather' : 'â¼ show full weather';
   localStorage.setItem('wx-expanded', expanded ? '1' : '0');
 }
 
-// ── DATE HELPERS ─────────────────────────────────────────────────────
+// ââ DATE HELPERS âââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function frostSafeDate() {
   const c = state.config.frost;
   const now = new Date(); now.setHours(0,0,0,0);
@@ -514,7 +526,7 @@ function cat(p) {
   return 'Soil';
 }
 
-// ── SIDEBAR ──────────────────────────────────────────────────────────
+// ââ SIDEBAR ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderSidebar() {
   const filters = ['All','DWC','Soil','Bonsai','Uncertain','Harden Off'];
   document.getElementById('filter-bar').innerHTML = filters.map(f =>
@@ -543,10 +555,10 @@ function renderSidebar() {
   }).join('') || '<div style="padding:14px;font-size:12px;color:var(--text3)">No plants in this category.</div>';
 }
 
-// ── DETAIL ───────────────────────────────────────────────────────────
+// ââ DETAIL âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderDetail() {
   const d = document.getElementById('detail');
-  if(!selectedId) { d.innerHTML = '<div class="empty-detail">← Select a plant to view details</div>'; return; }
+  if(!selectedId) { d.innerHTML = '<div class="empty-detail">â Select a plant to view details</div>'; return; }
   const p = state.plants.find(x=>x.id===selectedId);
   if(!p) return;
   const c = cat(p);
@@ -566,9 +578,9 @@ function renderDetail() {
           ${p.nickname?`<span class="badge badge-nickname">${p.nickname}</span>`:''}
         </div>
       </div>
-      <div class="detail-meta">${p.variety} · ${p.destination}</div>
-      <div class="detail-id">${p.id}${p.bucket?' · Bucket: '+p.bucket:''}</div>
-      ${p.sowDate?`<div class="detail-meta dim">Sown ${fmtDate(p.sowDate)} · Day ${days}</div>`:''}
+      <div class="detail-meta">${p.variety} Â· ${p.destination}</div>
+      <div class="detail-id">${p.id}${p.bucket?' Â· Bucket: '+p.bucket:''}</div>
+      ${p.sowDate?`<div class="detail-meta dim">Sown ${fmtDate(p.sowDate)} Â· Day ${days}</div>`:''}
     </div>
     <div style="padding:0 18px;border-bottom:1px solid var(--border);flex-shrink:0">
       <div class="tab-bar">${tabs.map(t=>`<button class="tab${currentTab===t?' active':''}" onclick="setTab('${t}')">${t}</button>`).join('')}</div>
@@ -590,7 +602,7 @@ function renderTab() {
   else if(currentTab==='harden off') renderHarden(p,tc);
 }
 
-// ── OVERVIEW ─────────────────────────────────────────────────────────
+// ââ OVERVIEW âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderOverview(p,tc) {
   const days = daysSince(p.sowDate);
   const lph = p._phLog.length ? p._phLog[p._phLog.length-1] : null;
@@ -599,7 +611,7 @@ function renderOverview(p,tc) {
     <div class="metrics-row">
       <div class="metric"><div class="metric-label">System</div><div class="metric-val sm">${p.system}</div></div>
       <div class="metric"><div class="metric-label">Light / day</div><div class="metric-val">${p._lightHours}<span class="metric-unit">h</span></div></div>
-      <div class="metric"><div class="metric-label">Age</div><div class="metric-val">${days!==null?days:'—'}<span class="metric-unit">${days!==null?'d':''}</span></div></div>
+      <div class="metric"><div class="metric-label">Age</div><div class="metric-val">${days!==null?days:'â'}<span class="metric-unit">${days!==null?'d':''}</span></div></div>
       ${lph?`<div class="metric"><div class="metric-label">Last pH</div><div class="metric-val ${lph.value>=5.8&&lph.value<=6.2?'ok':'bad'}">${lph.value.toFixed(1)}</div></div>`:
             `<div class="metric"><div class="metric-label">Category</div><div class="metric-val sm">${p.category}</div></div>`}
     </div>
@@ -612,16 +624,16 @@ function renderOverview(p,tc) {
     </div>
 
     <div class="two-col">
-      <div class="card"><div class="card-label">Group</div><div class="card-val">${p.group||'—'}</div></div>
+      <div class="card"><div class="card-label">Group</div><div class="card-val">${p.group||'â'}</div></div>
       <div class="card"><div class="card-label">Status</div><div class="card-val">${p._stage}</div></div>
     </div>
 
     ${p.shuRange?`<div class="card"><div class="card-label">Heat (SHU)</div><div class="card-val">${p.shuRange}</div></div>`:''}
-    ${p.viability?`<div class="alert gold"><strong>Low viability seeds:</strong> ${p.viability}<br>Keep at 85–90°F on heat mat. Do not discard before 6 weeks.</div>`:''}
+    ${p.viability?`<div class="alert gold"><strong>Low viability seeds:</strong> ${p.viability}<br>Keep at 85â90Â°F on heat mat. Do not discard before 6 weeks.</div>`:''}
     ${p.info?`<div class="card"><div class="card-label">Plant notes</div><div class="card-val dim">${p.info}</div></div>`:''}
 
-    ${lGrowLog?`<div class="card"><div class="card-label">Last grow log — ${lGrowLog.date}</div>
-      <div class="card-val">${lGrowLog.condition||''} ${lGrowLog.height?`· ${lGrowLog.height}" tall`:''} ${lGrowLog.leafCount?`· ${lGrowLog.leafCount} leaves`:''}</div>
+    ${lGrowLog?`<div class="card"><div class="card-label">Last grow log â ${lGrowLog.date}</div>
+      <div class="card-val">${lGrowLog.condition||''} ${lGrowLog.height?`Â· ${lGrowLog.height}" tall`:''} ${lGrowLog.leafCount?`Â· ${lGrowLog.leafCount} leaves`:''}</div>
       ${lGrowLog.notes?`<div class="card-val dim" style="margin-top:4px">${lGrowLog.notes}</div>`:''}
     </div>`:''}
 
@@ -634,13 +646,13 @@ function renderOverview(p,tc) {
         <span class="count">${p._waterLog ? p._waterLog.length : 0}</span>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
-        <button class="btn btn-green btn-sm" onclick="logWater('${p.id}','watered')">💧 Log watered</button>
-        <button class="btn btn-sm" onclick="logWater('${p.id}','dry check')">🔍 Log dry check</button>
-        <button class="btn btn-sm" onclick="logWater('${p.id}','skipped')">⏭ Skipped</button>
+        <button class="btn btn-green btn-sm" onclick="logWater('${p.id}','watered')">ð§ Log watered</button>
+        <button class="btn btn-sm" onclick="logWater('${p.id}','dry check')">ð Log dry check</button>
+        <button class="btn btn-sm" onclick="logWater('${p.id}','skipped')">â­ Skipped</button>
       </div>
       ${p._waterLog && p._waterLog.length ? `<ul class="log-list">
         ${[...p._waterLog].reverse().slice(0,5).map(w=>`<li>
-          <span class="log-text">${w.type==='watered'?'💧':w.type==='dry check'?'🔍':'⏭'} ${w.type}</span>
+          <span class="log-text">${w.type==='watered'?'ð§':w.type==='dry check'?'ð':'â­'} ${w.type}</span>
           <span class="log-date">${w.date}</span>
         </li>`).join('')}
       </ul>` : '<div class="empty-msg">No watering logged yet.</div>'}
@@ -648,7 +660,7 @@ function renderOverview(p,tc) {
   `;
 }
 
-// ── DWC TAB ───────────────────────────────────────────────────────────
+// ââ DWC TAB âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderDWC(p,tc) {
   const lph = p._phLog.length ? p._phLog[p._phLog.length-1] : null;
   const lec = p._ecLog.length ? p._ecLog[p._ecLog.length-1] : null;
@@ -657,30 +669,30 @@ function renderDWC(p,tc) {
   const lastDWC = dwcLogs.length ? dwcLogs[dwcLogs.length-1] : null;
 
   tc.innerHTML = `
-    <div class="alert good"><strong>Nutrient program complete ✓</strong> FoxFarm Hydro Trio on hand — Grow Big Hydro (veg, N) + Tiger Bloom (flowering, P/K) + Big Bloom (micros). Follow the FoxFarm feed chart and pH-adjust after mixing.</div>
+    <div class="alert good"><strong>Nutrient program complete â</strong> FoxFarm Hydro Trio on hand â Grow Big Hydro (veg, N) + Tiger Bloom (flowering, P/K) + Big Bloom (micros). Follow the FoxFarm feed chart and pH-adjust after mixing.</div>
 
     <div class="metrics-row">
       <div class="metric"><div class="metric-label">Last pH</div>
         <div class="metric-val ${lph?(phOk?'ok':'bad'):''}">
-          ${lph?lph.value.toFixed(1):'—'}</div><div class="metric-hint">Target 5.8–6.2</div></div>
+          ${lph?lph.value.toFixed(1):'â'}</div><div class="metric-hint">Target 5.8â6.2</div></div>
       <div class="metric"><div class="metric-label">Last EC</div>
-        <div class="metric-val">${lec?lec.value.toFixed(2):'—'}</div><div class="metric-hint">Seedling 0.8–1.2</div></div>
+        <div class="metric-val">${lec?lec.value.toFixed(2):'â'}</div><div class="metric-hint">Seedling 0.8â1.2</div></div>
       <div class="metric"><div class="metric-label">pH logs</div>
         <div class="metric-val">${p._phLog.length}</div></div>
       <div class="metric"><div class="metric-label">Bucket</div>
-        <div class="metric-val sm">${p.bucket||'—'}</div></div>
+        <div class="metric-val sm">${p.bucket||'â'}</div></div>
     </div>
 
     <div class="two-col">
       <div class="card"><div class="card-label">Log pH</div>
         <div class="input-row"><input type="number" id="ph-input" step="0.1" min="4" max="9" placeholder="e.g. 5.9">
         <button class="btn btn-green" onclick="logPH('${p.id}')">Log</button></div>
-        <div class="target-note">Target: 5.8–6.2 for peppers</div>
+        <div class="target-note">Target: 5.8â6.2 for peppers</div>
       </div>
       <div class="card"><div class="card-label">Log EC</div>
         <div class="input-row"><input type="number" id="ec-input" step="0.01" min="0" max="6" placeholder="e.g. 1.2">
         <button class="btn btn-green" onclick="logEC('${p.id}')">Log</button></div>
-        <div class="target-note">Seedling 0.8–1.2 · Veg 1.2–1.8 · Fruit 2.0–2.5</div>
+        <div class="target-note">Seedling 0.8â1.2 Â· Veg 1.2â1.8 Â· Fruit 2.0â2.5</div>
       </div>
     </div>
 
@@ -691,8 +703,8 @@ function renderDWC(p,tc) {
         <label>pH<input type="number" step="0.01" id="dwc-ph" placeholder="5.9"></label>
         <label>EC (mS/cm)<input type="number" step="0.01" id="dwc-ec" placeholder="1.2"></label>
         <label>PPM<input type="number" id="dwc-ppm" placeholder="600"></label>
-        <label>Water temp (°F)<input type="number" step="0.1" id="dwc-wtemp" placeholder="68"></label>
-        <label>Air temp (°F)<input type="number" step="0.1" id="dwc-atemp" placeholder="75"></label>
+        <label>Water temp (Â°F)<input type="number" step="0.1" id="dwc-wtemp" placeholder="68"></label>
+        <label>Air temp (Â°F)<input type="number" step="0.1" id="dwc-atemp" placeholder="75"></label>
         <label>Top off?<select id="dwc-topoff"><option>No</option><option>Yes</option></select></label>
         <label>Water change?<select id="dwc-change"><option>No</option><option>Yes</option></select></label>
         <label class="full">Root notes<textarea id="dwc-roots" rows="2" placeholder="Root color, smell, length..."></textarea></label>
@@ -718,7 +730,7 @@ function renderDWC(p,tc) {
       <ul class="log-list">
         ${[...dwcLogs].reverse().slice(0,6).map(l=>`<li>
           <div class="log-text">
-            <strong>${l.date}</strong> · pH ${l.ph||'—'} · EC ${l.ec||'—'} · ${l.waterTemp||'—'}°F water
+            <strong>${l.date}</strong> Â· pH ${l.ph||'â'} Â· EC ${l.ec||'â'} Â· ${l.waterTemp||'â'}Â°F water
             ${l.rootNotes?`<div class="log-meta">${l.rootNotes}</div>`:''}
             ${l.plantNotes?`<div class="log-meta">${l.plantNotes}</div>`:''}
           </div>
@@ -728,7 +740,7 @@ function renderDWC(p,tc) {
   `;
 }
 
-// ── GROW LOG TAB (GPT's best feature, enhanced) ───────────────────────
+// ââ GROW LOG TAB (GPT's best feature, enhanced) âââââââââââââââââââââââ
 function renderGrowLog(p,tc) {
   const plantLogs = state.logs.daily.filter(l=>l.plantId===p.id);
   tc.innerHTML = `
@@ -738,11 +750,11 @@ function renderGrowLog(p,tc) {
         <label>Date<input type="date" id="gl-date" value="${isoToday()}"></label>
         <label>Height (in)<input type="number" step="0.25" id="gl-height" placeholder="3.5"></label>
         <label>Leaf count<input type="number" id="gl-leaves" placeholder="4"></label>
-        <label>Watered?<select id="gl-watered"><option value="">—</option><option>Yes</option><option>No</option></select></label>
+        <label>Watered?<select id="gl-watered"><option value="">â</option><option>Yes</option><option>No</option></select></label>
         <label>Feed used<input type="text" id="gl-feed" placeholder="Big Bloom 5ml/gal"></label>
         <label>Outside min<input type="number" id="gl-outside" placeholder="30"></label>
         <label>Condition<select id="gl-condition">
-          <option value="">— select —</option>
+          <option value="">â select â</option>
           <option>Excellent</option><option>Good</option><option>Fair</option>
           <option>Stressed</option><option>Yellowing</option><option>Wilting</option><option>Poor</option>
         </select></label>
@@ -756,9 +768,9 @@ function renderGrowLog(p,tc) {
       ${plantLogs.length ?
         `<ul class="log-list">${[...plantLogs].reverse().map(l=>`<li>
           <div class="log-text">
-            <strong>${l.date}</strong>${l.condition?' · '+l.condition:''}
-            ${l.height?` · ${l.height}" tall`:''}${l.leafCount?` · ${l.leafCount} leaves`:''}
-            ${l.outsideMinutes?` · ${l.outsideMinutes} min outside`:''}
+            <strong>${l.date}</strong>${l.condition?' Â· '+l.condition:''}
+            ${l.height?` Â· ${l.height}" tall`:''}${l.leafCount?` Â· ${l.leafCount} leaves`:''}
+            ${l.outsideMinutes?` Â· ${l.outsideMinutes} min outside`:''}
             ${l.feed?`<div class="log-meta">Feed: ${l.feed}</div>`:''}
             ${l.notes?`<div class="log-meta">${l.notes}</div>`:''}
           </div>
@@ -769,7 +781,7 @@ function renderGrowLog(p,tc) {
   `;
 }
 
-// ── FEED TAB ──────────────────────────────────────────────────────────
+// ââ FEED TAB ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderFeed(p,tc) {
   tc.innerHTML = `
     <div class="card"><div class="card-label">Log feeding</div>
@@ -779,8 +791,8 @@ function renderFeed(p,tc) {
       </div>
     </div>
     ${p.system==='DWC'?`<div class="alert good">
-      <strong>FoxFarm Hydro Trio complete ✓</strong><br>
-      Wk 1–3: Grow Big Hydro ¼ str · Wk 4–6: + Big Bloom · Wk 7+: Tiger Bloom + Big Bloom<br>
+      <strong>FoxFarm Hydro Trio complete â</strong><br>
+      Wk 1â3: Grow Big Hydro Â¼ str Â· Wk 4â6: + Big Bloom Â· Wk 7+: Tiger Bloom + Big Bloom<br>
       Always pH-adjust reservoir AFTER mixing nutrients.
     </div>`:''}
     <div class="card"><div class="card-label">Feed history <span class="count">${p._feeds.length}</span></div>
@@ -793,7 +805,7 @@ function renderFeed(p,tc) {
   `;
 }
 
-// ── LIGHT TAB ─────────────────────────────────────────────────────────
+// ââ LIGHT TAB âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderLight(p,tc) {
   const pct = Math.round(((p._lightHours-12)/8)*100);
   tc.innerHTML = `
@@ -809,12 +821,12 @@ function renderLight(p,tc) {
     </div>
     <div class="card"><div class="card-label">Recommendations by stage</div>
       <table class="rec-table">
-        <tr><td>Seedling / germination</td><td class="ok">16–18h</td></tr>
-        <tr><td>Vegetative</td><td class="ok">16–18h</td></tr>
-        <tr><td>Pepper flowering / fruiting</td><td class="warn">12–14h</td></tr>
-        <tr><td>Tomato fruiting</td><td class="warn">14–16h</td></tr>
-        <tr><td>Lettuce (prevent bolt)</td><td class="warn">14–16h</td></tr>
-        <tr><td>Bonsai</td><td class="info">12–14h</td></tr>
+        <tr><td>Seedling / germination</td><td class="ok">16â18h</td></tr>
+        <tr><td>Vegetative</td><td class="ok">16â18h</td></tr>
+        <tr><td>Pepper flowering / fruiting</td><td class="warn">12â14h</td></tr>
+        <tr><td>Tomato fruiting</td><td class="warn">14â16h</td></tr>
+        <tr><td>Lettuce (prevent bolt)</td><td class="warn">14â16h</td></tr>
+        <tr><td>Bonsai</td><td class="info">12â14h</td></tr>
       </table>
     </div>
     <div class="card"><div class="card-label">Your setup</div>
@@ -825,7 +837,7 @@ function renderLight(p,tc) {
   `;
 }
 
-// ── HARDEN OFF TAB ────────────────────────────────────────────────────
+// ââ HARDEN OFF TAB ââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function renderHarden(p,tc) {
   const frostDate = frostSafeDate();
   const safePlant = safePlantDate();
@@ -838,13 +850,13 @@ function renderHarden(p,tc) {
   const coldNote = p.category==='Lettuce'
     ? 'High cold tolerance. Tolerates light frost once hardened. Can begin hardening now.'
     : p.category==='Tomato'
-    ? 'Cold-sensitive below 50°F. Begin ~Apr 7–10. Day 1–2 wilting is normal.'
-    : 'Cold-sensitive. Do not expose below 55°F. Start after Apr 27.';
+    ? 'Cold-sensitive below 50Â°F. Begin ~Apr 7â10. Day 1â2 wilting is normal.'
+    : 'Cold-sensitive. Do not expose below 55Â°F. Start after Apr 27.';
 
   const rows = HARDEN_SCHEDULE.map((s,i) => {
     const d = addDays(TODAY, i);
     const ds = d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    let hi='—', lo='—', cls='', frost=false;
+    let hi='â', lo='â', cls='', frost=false;
     if(weatherData && weatherData.daily.temperature_2m_max[i] !== undefined) {
       hi = Math.round(weatherData.daily.temperature_2m_max[i]);
       lo = Math.round(weatherData.daily.temperature_2m_min[i]);
@@ -854,11 +866,11 @@ function renderHarden(p,tc) {
     const isT = p._hardenStart && hd===s.day;
     const isPast = p._hardenStart && hd > s.day;
     return `<tr class="${isT?'today-row':''} ${isPast?'past-row':''}">
-      <td>${p._hardenStart?(isPast?'✓':isT?'▶':s.day):s.day}</td>
+      <td>${p._hardenStart?(isPast?'â':isT?'â¶':s.day):s.day}</td>
       <td>${ds}</td>
       <td>${s.hours}h <span class="${s.shade?'shade-tag':'sun-tag'}">${s.shade?'shade':'sun'}</span></td>
       <td class="notes-col">${s.notes}</td>
-      <td class="${frost?'bad':cls}">${hi!=='—'?hi+'°/'+lo+'°':'—'}${frost?' ❄':''}</td>
+      <td class="${frost?'bad':cls}">${hi!=='â'?hi+'Â°/'+lo+'Â°':'â'}${frost?' â':''}</td>
     </tr>`;
   }).join('');
 
@@ -877,12 +889,12 @@ function renderHarden(p,tc) {
            <button class="btn btn-green" onclick="startHarden('${p.id}')">Start hardening today</button>`
         :`<div class="harden-progress">
             <div class="hp-track"><div class="hp-fill" style="width:${Math.min(100,(Math.min(hd,10)/10)*100)}%"></div></div>
-            <div class="hp-label">Day ${Math.min(hd,10)} of 10${hd>=10?' — protocol complete ✓':''}</div>
+            <div class="hp-label">Day ${Math.min(hd,10)} of 10${hd>=10?' â protocol complete â':''}</div>
           </div>
           <button class="btn btn-danger btn-sm" onclick="resetHarden('${p.id}')" style="margin-top:6px">Reset clock</button>`}
     </div>
 
-    <div class="card"><div class="card-label">10-day protocol · Bella Vista, AR · full sun · ${weatherData?'live forecast':'loading weather...'}</div>
+    <div class="card"><div class="card-label">10-day protocol Â· Bella Vista, AR Â· full sun Â· ${weatherData?'live forecast':'loading weather...'}</div>
       <div style="overflow-x:auto">
         <table class="harden-table">
           <thead><tr><th>Day</th><th>Date</th><th>Outside</th><th>Guidance</th><th>Forecast hi/lo</th></tr></thead>
@@ -893,7 +905,7 @@ function renderHarden(p,tc) {
   `;
 }
 
-// ── ACTIONS ───────────────────────────────────────────────────────────
+// ââ ACTIONS âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function setFilter(f)    { currentFilter=f; renderSidebar(); }
 function setTab(t)       { currentTab=t; renderDetail(); }
 function selectPlant(id) { selectedId=id; currentTab='overview'; renderDetail(); renderSidebar(); }
@@ -988,7 +1000,7 @@ function logWater(id, type) {
   saveLogs(); renderTab();
 }
 
-// ── EXPORT / IMPORT ───────────────────────────────────────────────────
+// ââ EXPORT / IMPORT âââââââââââââââââââââââââââââââââââââââââââââââââââ
 function exportData() {
   const blob = new Blob([JSON.stringify(state.logs, null, 2)], {type:'application/json'});
   const a = document.createElement('a');
@@ -1012,10 +1024,10 @@ function importData(e) {
       }
       saveLogs(); renderSidebar(); renderDetail();
       alert('Data imported successfully.');
-    } catch(err) { alert('Import failed — invalid JSON file.'); }
+    } catch(err) { alert('Import failed â invalid JSON file.'); }
   };
   r.readAsText(f);
 }
 
-// ── BOOT ───────────────────────────────────────────────────────────────
+// ââ BOOT âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 document.addEventListener('DOMContentLoaded', init);
