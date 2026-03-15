@@ -62,7 +62,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 /* ── WEATHER PANEL ─────────────────────────── */
 #weather-panel {
   flex-shrink: 0; background: var(--bg2); border-bottom: 1px solid var(--border);
-  overflow-y: auto; max-height: 42vh;
+  overflow-y: visible; max-height: none;
 }
 #weather-panel::-webkit-scrollbar { height: 3px; }
 
