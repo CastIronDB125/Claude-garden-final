@@ -466,7 +466,22 @@ function renderWeather(data) {
       }).join('')}
     </div>
     ${hourlyHTML}
+    <button class="wx-collapse-btn" id="wx-toggle" onclick="toggleWeather()">▲ collapse weather</button>
   `;
+  // Restore expanded state if previously set
+  if(localStorage.getItem('wx-expanded') === '1') {
+    panel.classList.add('wx-expanded');
+    const btn = document.getElementById('wx-toggle');
+    if(btn) btn.textContent = '▲ collapse weather';
+  }
+}
+
+function toggleWeather() {
+  const panel = document.getElementById('weather-panel');
+  const btn   = document.getElementById('wx-toggle');
+  const expanded = panel.classList.toggle('wx-expanded');
+  btn.textContent = expanded ? '▲ collapse weather' : '▼ show full weather';
+  localStorage.setItem('wx-expanded', expanded ? '1' : '0');
 }
 
 // ── DATE HELPERS ─────────────────────────────────────────────────────

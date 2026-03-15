@@ -62,7 +62,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 /* ── WEATHER PANEL ─────────────────────────── */
 #weather-panel {
   flex-shrink: 0; background: var(--bg2); border-bottom: 1px solid var(--border);
-  overflow-y: auto; max-height: 42vh;
+  overflow-y: visible; max-height: none;
 }
 #weather-panel::-webkit-scrollbar { height: 3px; }
 
@@ -348,6 +348,23 @@ select option { background: var(--bg3); }
 .grow-log-section { margin-bottom: 12px; }
 .grow-log-divider  { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; padding: 8px 0 6px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
 
+/* ── WEATHER PANEL COLLAPSE TOGGLE ──────────── */
+.wx-collapse-btn {
+  display: none; /* hidden on desktop */
+  width: 100%;
+  padding: 10px 18px;
+  background: var(--bg3);
+  border: none;
+  border-top: 1px solid var(--border);
+  color: var(--text2);
+  font-family: var(--mono);
+  font-size: 11px;
+  cursor: pointer;
+  text-align: center;
+  letter-spacing: .05em;
+}
+.wx-collapse-btn:hover { background: var(--bg4); color: var(--text); }
+
 /* ── RESPONSIVE ────────────────────────────── */
 @media (max-width: 900px) {
   :root { --sidebar-w: 190px; }
@@ -355,15 +372,119 @@ select option { background: var(--bg3); }
   .wx-details   { grid-template-columns: repeat(2, 1fr); }
   .form-grid    { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
 @media (max-width: 650px) {
   :root { --sidebar-w: 100%; }
-  #body { flex-direction: column; }
-  #sidebar { height: 200px; border-right: none; border-bottom: 1px solid var(--border); }
-  #plant-list { flex-direction: row; display: flex; overflow-x: auto; overflow-y: hidden; }
-  .plant-item { min-width: 150px; border-right: 1px solid var(--border); border-bottom: none; }
+
+  /* ── App shell — full vertical stack ── */
+  html, body { overflow: hidden; }
+  #app { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* ── Header compact ── */
+  #top-header { padding: 0 12px; min-height: 44px; }
+  #top-header h1 { font-size: 14px; }
+  #top-header p  { display: none; }
+
+  /* ── Weather panel — collapsed by default on mobile ── */
+  #weather-panel {
+    flex-shrink: 0;
+    overflow: hidden;
+    max-height: 120px;        /* show narrative + temp only */
+    transition: max-height 0.3s ease;
+  }
+  #weather-panel.wx-expanded {
+    max-height: 85vh;         /* expanded: scrollable full panel */
+    overflow-y: auto;
+  }
+
+  /* Show the collapse toggle button on mobile */
+  .wx-collapse-btn { display: block; flex-shrink: 0; }
+
+  /* Narrative takes full width, slightly smaller */
+  .wx-narrative { padding: 10px 14px 8px; }
+  .wx-narrative-opening { font-size: 12px; }
+  .wx-narrative-verdict { font-size: 11px; }
+
+  /* wx-top stacks vertically */
   .wx-top { grid-template-columns: 1fr; }
-  .wx-sun-moon { border-left: none; border-top: 1px solid var(--border); }
+  .wx-sun-moon { border-left: none; border-top: 1px solid var(--border); min-width: unset; }
+  .wx-details { grid-template-columns: repeat(2, 1fr); padding: 10px 14px; gap: 6px 12px; }
+  .wx-temp-big { font-size: 32px; }
+
+  /* Garden strip scrolls horizontally */
+  .wx-garden-strip { overflow-x: auto; }
+  .wx-garden-metric { padding: 6px 12px; }
+
+  /* Forecast strip scrolls horizontally */
+  .wx-forecast-strip { overflow-x: auto; }
+  .wx-forecast-day { min-width: 70px; padding: 6px 8px; }
+
+  /* Hourly grid: 2 columns, scrollable */
+  .hourly-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  /* ── Body: sidebar above, detail below ── */
+  #body {
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* Sidebar: compact horizontal scrolling strip */
+  #sidebar {
+    height: auto;
+    min-height: 0;
+    max-height: 220px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  #filter-bar {
+    padding: 6px 10px;
+    gap: 4px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  .filter-btn { white-space: nowrap; flex-shrink: 0; }
+
+  #plant-list {
+    flex-direction: row;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  .plant-item {
+    min-width: 160px;
+    max-width: 160px;
+    border-right: 1px solid var(--border);
+    border-bottom: none;
+    flex-shrink: 0;
+  }
+
+  /* Detail panel: fills rest of screen, scrollable */
+  #detail {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    min-height: 0;
+  }
+  #detail-header { padding: 10px 14px 0; }
+  .detail-title { font-size: 15px; }
+  #tab-content { padding: 10px 14px 20px; }
+
+  /* Forms and tables */
+  .form-grid { grid-template-columns: 1fr 1fr; }
+  .form-grid .full { grid-column: 1 / -1; }
+  .metrics-row { grid-template-columns: 1fr 1fr; }
+  .two-col { grid-template-columns: 1fr; }
   .harden-dates-row { grid-template-columns: 1fr; }
+  .harden-table th, .harden-table td { font-size: 10px; padding: 5px 4px 5px 0; }
+
+  /* Tab bar scrolls */
+  .tab-bar { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+  .tab { white-space: nowrap; }
 }
 
 /* ── WEATHER NARRATIVE ───────────────────────────────────────────────── */
