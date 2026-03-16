@@ -1033,6 +1033,8 @@ function importData(e) {
               _feeds:       m._feeds       || [],
               _phLog:       m._phLog       || [],
               _ecLog:       m._ecLog       || [],
+              _waterLog:    m._waterLog    || [],
+              _photos:      m._photos      || [],
               _hardenStart: m._hardenStart || null,
               _stage:       m._stage       || p.status,
               _lightHours:  m._lightHours  || defaultLight(p)
